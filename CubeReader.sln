@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27428.2015
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CubeReader", "CubeReader\CubeReader.csproj", "{9CAB5EDF-320B-4AA7-86F6-BD1CEE5E388C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Classes", "Classes\Classes.csproj", "{225ED672-03DF-404E-A782-E0CB2E515410}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9CAB5EDF-320B-4AA7-86F6-BD1CEE5E388C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CAB5EDF-320B-4AA7-86F6-BD1CEE5E388C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CAB5EDF-320B-4AA7-86F6-BD1CEE5E388C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CAB5EDF-320B-4AA7-86F6-BD1CEE5E388C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{225ED672-03DF-404E-A782-E0CB2E515410}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{225ED672-03DF-404E-A782-E0CB2E515410}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{225ED672-03DF-404E-A782-E0CB2E515410}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{225ED672-03DF-404E-A782-E0CB2E515410}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {403B2941-7F2C-43C2-9F4F-A923A9D54813}
+	EndGlobalSection
+EndGlobal

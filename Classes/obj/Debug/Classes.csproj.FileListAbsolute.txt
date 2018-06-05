@@ -1,0 +1,6 @@
+D:\020. Git\CubeReader\Classes\bin\Debug\Classes.dll
+D:\020. Git\CubeReader\Classes\bin\Debug\Classes.pdb
+D:\020. Git\CubeReader\Classes\obj\Debug\Classes.csprojResolveAssemblyReference.cache
+D:\020. Git\CubeReader\Classes\obj\Debug\Classes.csproj.CoreCompileInputs.cache
+D:\020. Git\CubeReader\Classes\obj\Debug\Classes.dll
+D:\020. Git\CubeReader\Classes\obj\Debug\Classes.pdb

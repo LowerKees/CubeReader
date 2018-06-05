@@ -1,0 +1,10 @@
+D:\020. Git\CubeReader\CubeReader\bin\Debug\CubeReader.exe.config
+D:\020. Git\CubeReader\CubeReader\bin\Debug\CubeReader.exe
+D:\020. Git\CubeReader\CubeReader\bin\Debug\CubeReader.pdb
+D:\020. Git\CubeReader\CubeReader\obj\Debug\CubeReader.csprojResolveAssemblyReference.cache
+D:\020. Git\CubeReader\CubeReader\obj\Debug\CubeReader.csproj.CoreCompileInputs.cache
+D:\020. Git\CubeReader\CubeReader\obj\Debug\CubeReader.exe
+D:\020. Git\CubeReader\CubeReader\obj\Debug\CubeReader.pdb
+D:\020. Git\CubeReader\CubeReader\bin\Debug\Classes.dll
+D:\020. Git\CubeReader\CubeReader\bin\Debug\Classes.pdb
+D:\020. Git\CubeReader\CubeReader\obj\Debug\CubeReader.csproj.CopyComplete
