@@ -8,6 +8,26 @@ namespace Classes
 {
     public class DataSource
     {
-        string dsConnString;
+        private string dsConnString;
+
+        public DataSource()
+        {
+            this.dsConnString = null;
+        }
+
+        public string _dsConnString
+        {
+            get
+            {
+                return dsConnString;
+            }
+            set
+            {
+                if (value is string)
+                {
+                    dsConnString = value;
+                }
+            }
+        }
     }
 }

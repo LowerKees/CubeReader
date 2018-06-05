@@ -22,6 +22,8 @@ namespace Classes
             this.cubeDs = new DataSource();
         }
 
+        public string _cubeName { get; set; }
+
         public List<CubeTable> _cubeTables
         {
             get
@@ -37,6 +39,21 @@ namespace Classes
                 else
                 {
                     Console.WriteLine("Cannot add table list to cube");
+                }
+            }
+        }
+
+        public DataSource _cubeDs
+        {
+            get
+            {
+                return cubeDs;
+            }
+            set
+            {
+                if (value is DataSource)
+                {
+                    cubeDs = value;
                 }
             }
         }
@@ -98,9 +115,9 @@ namespace Classes
             return foundTables;
         }
 
-        public List<string> getCubeDsv(string cubePath)
+        public DataSource getCubeDataSource(string cubePath)
         {
-            List<string> dsv = new List<string>();
+            DataSource myDataSource = new DataSource();
 
             XmlDocument myXmlCube = new XmlDocument();
             myXmlCube = loadCube(cubePath);
@@ -131,14 +148,44 @@ namespace Classes
                 nodes = root.SelectNodes(xPath);
             }
 
+            // TODO: Check for multiple connection strings
             foreach(XmlNode node in nodes)
             {
-                Console.WriteLine($"Found the connection string {node.InnerText}");
-
-                dsv.Add(node.InnerText);
+                myDataSource._dsConnString = node.InnerText;
             }
             
-            return dsv;
+            return myDataSource;
+        }
+
+        public string getCubeName(string cubePath)
+        {
+            // Create, configure and load xml items and values
+            XmlDocument myXmlCube = new XmlDocument();
+            myXmlCube = loadCube(cubePath);
+            XmlNode root = myXmlCube.DocumentElement;
+
+            // Determine xpath to search for cube name
+            XmlNode nameNode;
+            string xNamePath = "/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database/~ns~:Name";
+
+            if (root.Attributes["xmlns"] != null)
+            {
+                string xmlns = root.Attributes["xmlns"].Value;
+                XmlNamespaceManager nsmgr = new XmlNamespaceManager(myXmlCube.NameTable);
+
+                string xmlnsName = "cubeReading";
+                nsmgr.AddNamespace(xmlnsName, xmlns);
+
+                xNamePath = xNamePath.Replace("~ns~", xmlnsName);
+                nameNode = root.SelectSingleNode(xNamePath, nsmgr);
+            }
+            else
+            {
+                xNamePath = xNamePath.Replace("~ns~:", string.Empty);
+                nameNode = root.SelectSingleNode(xNamePath);
+            }
+
+            return nameNode.InnerText;
         }
 
         public static XmlDocument loadCube(string cubePath)

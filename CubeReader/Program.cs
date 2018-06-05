@@ -54,11 +54,14 @@ namespace CubeReader
                     // TODO: maak een loop voor xmlaFiles voor het vangen van meerdere cube files
                     myCube._cubeTables.AddRange(myCube.GetCubeTables(xmlaFiles[0]));
 
-                    // Print tables and columns
-                    getCubeInfo(myCube._cubeTables);
-
                     // Get cube connection string
-                    myCube.getCubeDsv(xmlaFiles[0]);
+                    myCube._cubeDs = myCube.getCubeDataSource(xmlaFiles[0]);
+
+                    // Get cube name
+                    myCube._cubeName = myCube.getCubeName(xmlaFiles[0]);
+
+                    // Print tables and columns
+                    getCubeInfo(myCube);
                 }
                 catch (Exception e) 
                 {
@@ -78,9 +81,11 @@ namespace CubeReader
             return cubePath;
         }
 
-        public static void getCubeInfo(List<CubeTable> cubeTableList)
+        public static void getCubeInfo(Cube myCube)
         {
-            foreach (CubeTable cubeTable in cubeTableList)
+            Console.WriteLine($"Found the cube {myCube._cubeName}");
+            Console.WriteLine($"Found the connection string {myCube._cubeDs._dsConnString}.");
+            foreach (CubeTable cubeTable in myCube._cubeTables)
             {
                 Console.WriteLine($"Found the table {cubeTable._tableName}");
                 Console.WriteLine("Column list:");
