@@ -14,32 +14,23 @@ namespace Classes
         private List<CubeTable> cubeTables;
         private List<string> cubeInitCat;
         private DataSource cubeDs;
+        private string cubeName;
 
-        public Cube()
+        public Cube(string cubePath)
         {
-            this.cubeTables = new List<CubeTable>();
-            this.cubeInitCat = new List<string>();
-            this.cubeDs = new DataSource();
+            this.cubeTables = GetCubeTables(cubePath);
+            this.cubeInitCat = null;
+            this.cubeDs = getCubeDataSource(cubePath);
+            this.cubeName = getCubeName(cubePath);
         }
 
-        public string _cubeName { get; set; }
+        public string _cubeName { get; }
 
         public List<CubeTable> _cubeTables
         {
             get
             {
                 return cubeTables;
-            }
-            set
-            {
-                if (value is List<CubeTable>)
-                {
-                    cubeTables.AddRange(value);
-                }
-                else
-                {
-                    Console.WriteLine("Cannot add table list to cube");
-                }
             }
         }
 
@@ -49,16 +40,9 @@ namespace Classes
             {
                 return cubeDs;
             }
-            set
-            {
-                if (value is DataSource)
-                {
-                    cubeDs = value;
-                }
-            }
         }
 
-        public List<CubeTable> GetCubeTables(string cubePath)
+        private List<CubeTable> GetCubeTables(string cubePath)
         {
             List<CubeTable> foundTables = new List<CubeTable>();
 
@@ -115,7 +99,7 @@ namespace Classes
             return foundTables;
         }
 
-        public DataSource getCubeDataSource(string cubePath)
+        private DataSource getCubeDataSource(string cubePath)
         {
             DataSource myDataSource = new DataSource();
 
@@ -157,7 +141,7 @@ namespace Classes
             return myDataSource;
         }
 
-        public string getCubeName(string cubePath)
+        private string getCubeName(string cubePath)
         {
             // Create, configure and load xml items and values
             XmlDocument myXmlCube = new XmlDocument();
@@ -188,7 +172,7 @@ namespace Classes
             return nameNode.InnerText;
         }
 
-        public static XmlDocument loadCube(string cubePath)
+        private static XmlDocument loadCube(string cubePath)
         {
             XmlDocument myXmlCube = new XmlDocument();
             myXmlCube.Load(cubePath);

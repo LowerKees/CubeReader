@@ -54,15 +54,7 @@ namespace CubeReader
                 {
                     foreach (string cubeFile in xmlaFiles)
                     {
-                        Cube myCube = new Cube();
-
-                        myCube._cubeTables.AddRange(myCube.GetCubeTables(cubeFile));
-
-                        // Get cube connection string
-                        myCube._cubeDs = myCube.getCubeDataSource(cubeFile);
-
-                        // Get cube name
-                        myCube._cubeName = myCube.getCubeName(cubeFile);
+                        Cube myCube = new Cube(cubeFile);
 
                         // Print tables and columns
                         getCubeInfo(myCube);
