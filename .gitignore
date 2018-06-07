@@ -3,3 +3,8 @@
 ################################################################################
 
 /.vs/CubeReader/v15
+
+## ignore build artifacts and folders
+*.exe
+/CubeReader/Bin/*
+/CubeReader/Obj/*
