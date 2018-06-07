@@ -47,21 +47,29 @@ namespace CubeReader
                 List<string> xmlaFiles = new List<string>();
                 xmlaFiles.AddRange(getFileList(cubePath));
 
-                Cube myCube = new Cube();
+                // TODO: lijst van cubes maken
+                List<Cube> compareCubeList = new List<Cube>();
 
                 try
                 {
-                    // TODO: maak een loop voor xmlaFiles voor het vangen van meerdere cube files
-                    myCube._cubeTables.AddRange(myCube.GetCubeTables(xmlaFiles[0]));
+                    foreach (string cubeFile in xmlaFiles)
+                    {
+                        Cube myCube = new Cube();
 
-                    // Get cube connection string
-                    myCube._cubeDs = myCube.getCubeDataSource(xmlaFiles[0]);
+                        myCube._cubeTables.AddRange(myCube.GetCubeTables(cubeFile));
 
-                    // Get cube name
-                    myCube._cubeName = myCube.getCubeName(xmlaFiles[0]);
+                        // Get cube connection string
+                        myCube._cubeDs = myCube.getCubeDataSource(cubeFile);
 
-                    // Print tables and columns
-                    getCubeInfo(myCube);
+                        // Get cube name
+                        myCube._cubeName = myCube.getCubeName(cubeFile);
+
+                        // Print tables and columns
+                        getCubeInfo(myCube);
+
+                        // Add the cube to the compare list
+                        compareCubeList.Add(myCube);
+                    }
                 }
                 catch (Exception e) 
                 {
