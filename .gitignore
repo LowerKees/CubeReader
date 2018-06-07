@@ -6,5 +6,5 @@
 
 ## ignore build artifacts and folders
 *.exe
-/CubeReader/Bin/*
-/CubeReader/Obj/*
+\CubeReader\Bin\**
+\CubeReader\Obj\**
