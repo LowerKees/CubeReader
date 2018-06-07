@@ -9,6 +9,7 @@ namespace Classes
     public class DataSource
     {
         private string dsConnString;
+        private string dsDatabase;
 
         public DataSource()
         {
