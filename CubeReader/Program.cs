@@ -85,6 +85,7 @@ namespace CubeReader
         {
             Console.WriteLine($"Found the cube {myCube._cubeName}");
             Console.WriteLine($"Found the connection string {myCube._cubeDs._dsConnString}.");
+            Console.WriteLine($"Found the initial catalog {myCube._cubeDs._dsInitCatalog}");
             foreach (CubeTable cubeTable in myCube._cubeTables)
             {
                 Console.WriteLine($"Found the table {cubeTable._tableName}");
