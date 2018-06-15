@@ -12,14 +12,12 @@ namespace Classes
     public class Cube
     {
         private List<CubeTable> cubeTables;
-        private List<string> cubeInitCat;
         private DataSource cubeDs;
         private string cubeName;
 
         public Cube(string cubePath)
         {
             this.cubeTables = GetCubeTables(cubePath);
-            this.cubeInitCat = null;
             this.cubeDs = getCubeDataSource(cubePath);
             this.cubeName = getCubeName(cubePath);
         }
@@ -137,6 +135,8 @@ namespace Classes
             {
                 myDataSource._dsConnString = node.InnerText;
             }
+
+            myDataSource._dsInitCatalog = getCubeInitialCatalog(myDataSource);
             
             return myDataSource;
         }
@@ -170,6 +170,29 @@ namespace Classes
             }
 
             return nameNode.InnerText;
+        }
+
+        private string getCubeInitialCatalog(DataSource datasource)
+        { 
+            // Method performs text search for initial catalog value
+            string initCat;
+            string searchString = "Initial Catalog=";
+            int startIndex = datasource._dsConnString.IndexOf(searchString) + (searchString).Length;
+            int lengthIndex;
+            string remainingString = datasource._dsConnString.Substring(startIndex, datasource._dsConnString.Length - startIndex);
+
+            if (remainingString.Contains(";"))
+            {
+                lengthIndex = remainingString.IndexOf(";");
+            }
+            else
+            {
+                lengthIndex = remainingString.Length;
+            }
+
+            initCat = datasource._dsConnString.Substring(startIndex, lengthIndex);
+
+            return initCat;
         }
 
         private static XmlDocument loadCube(string cubePath)
