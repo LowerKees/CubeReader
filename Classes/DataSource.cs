@@ -9,11 +9,12 @@ namespace Classes
     public class DataSource
     {
         private string dsConnString;
-        private string dsDatabase;
+        private string dsInitCatalog;
 
         public DataSource()
         {
             this.dsConnString = null;
+            this.dsInitCatalog = null;
         }
 
         public string _dsConnString
@@ -27,6 +28,21 @@ namespace Classes
                 if (value is string)
                 {
                     dsConnString = value;
+                }
+            }
+        }
+
+        public string _dsInitCatalog
+        {
+            get
+            {
+                return dsInitCatalog;
+            }
+            set
+            {
+                if (value is string)
+                {
+                    dsInitCatalog = value;
                 }
             }
         }
