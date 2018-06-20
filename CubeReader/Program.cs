@@ -62,7 +62,14 @@ namespace CubeReader
                         Database database = new Database(dacpacFile);
 
                         // Unpack the dacpac files
-                        database.unpackDacpac(dacpacFile);
+                        string unpackingPath = Environment.CurrentDirectory + "\\Unpacking";
+                        
+                        // Empty target location for each run
+                        foreach (string file in Directory.GetFiles(unpackingPath))
+                        {
+                            File.Delete(file);
+                        }
+                        database.unpackDacpac(dacpacFile, unpackingPath);
                     }
                 }
                 catch (Exception e)

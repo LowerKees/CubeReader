@@ -19,25 +19,16 @@ namespace Classes
             databaseTables = null;
         }     
         
-        public void unpackDacpac(string dacpacPath)
+        public void unpackDacpac(string dacpacPath, string unpackingPath)
         {
             Console.WriteLine($"Unpacking dacpac from {dacpacPath}");
-            string unpackingPath = Path.Combine(Environment.CurrentDirectory, @"\Unpacking");
 
-            // Empty target location for each run
-            foreach(string file in Directory.GetFiles(unpackingPath))
-            {
-                File.Delete(file);
-            }
-
+            unpackingPath += ("\\" + Path.GetFileNameWithoutExtension(dacpacPath));
+            
             // Unzip the dacpac file
             // Create async operation for unzip
-            foreach(string file in Directory.GetFiles(dacpacPath, "*.dacpac"))
-            {
-                Console.WriteLine($"Unzipping {file}...");
-                ZipFile.ExtractToDirectory(file, unpackingPath);
-            }
-                    
+            Console.WriteLine($"Unzipping {dacpacPath}...");
+            ZipFile.ExtractToDirectory(dacpacPath, unpackingPath);       
         }
     }
 }
