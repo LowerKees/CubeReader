@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -52,30 +53,55 @@ namespace CubeReader
                     Console.WriteLine($"An error occured while reading the cube: {e.Message}");
                 }
 
-                // Unpack and read .dacpac files
+                // Unpack.dacpac files
                 List<string> dacpacFileList = new List<string>();
                 dacpacFileList.AddRange(getFileList(dacpacPath, "*.dacpac"));
+                string unpackingPath = Environment.CurrentDirectory + "\\Unpacking";
+                
+                // Unpack the dacpac files
                 try
                 {
-                    foreach(string dacpacFile in dacpacFileList)
-                    {
-                        Database database = new Database(dacpacFile);
 
-                        // Unpack the dacpac files
-                        string unpackingPath = Environment.CurrentDirectory + "\\Unpacking";
-                        
-                        // Empty target location for each run
-                        foreach (string file in Directory.GetFiles(unpackingPath))
+                    // Empty target location for each run
+                    foreach (string dir in Directory.GetDirectories(unpackingPath))
+                    {
+                        foreach(string file in Directory.GetFiles(dir))
                         {
                             File.Delete(file);
                         }
-                        database.unpackDacpac(dacpacFile, unpackingPath);
+
+                        Directory.Delete(dir);
+                    }
+
+                    // Unpack the dacpac
+                    foreach (string file in dacpacFileList)
+                    {
+                        unpackDacpac(file, unpackingPath);
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"An error occured while reading dacpac files: {e.Message}");
+                    Console.WriteLine($"An error occured while unpacking dacpac files: {e.Message}");
                 }
+
+                // Read the model.xml file from the dacpac into memory
+                List<Database> compareDatabaseList = new List<Database>();
+
+                try
+                {
+                    foreach (string dir in Directory.GetDirectories(unpackingPath))
+                    {
+                        foreach(string file in Directory.GetFiles(dir, "model.xml"))
+                        {
+                            Database database = new Database(file);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"An error occured while reading dacpac model.xml files: {e.Message}");
+                }
+
 
                 // TODO: remove debug statement
                 Console.ReadKey();
@@ -146,6 +172,18 @@ namespace CubeReader
                 i = -1;
                 path = setCubePath();
             }
+        }
+
+        public static void unpackDacpac(string dacpacPath, string unpackingPath)
+        {
+            Console.WriteLine($"Unpacking dacpac from {dacpacPath}");
+
+            unpackingPath += ("\\" + Path.GetFileNameWithoutExtension(dacpacPath));
+
+            // Unzip the dacpac file
+            // Create async operation for unzip
+            Console.WriteLine($"Unzipping {dacpacPath}...");
+            ZipFile.ExtractToDirectory(dacpacPath, unpackingPath);
         }
     }
 }
