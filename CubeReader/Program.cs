@@ -94,6 +94,11 @@ namespace CubeReader
                         foreach(string file in Directory.GetFiles(dir, "model.xml"))
                         {
                             Database database = new Database(file);
+
+                            // Print info to client
+                            getDatabaseInfo(database);
+
+                            compareDatabaseList.Add(database);
                         }
                     }
                 }
@@ -136,6 +141,22 @@ namespace CubeReader
                 foreach (Column cubeColumn in cubeTable.columnList)
                 {
                     Console.WriteLine($"Column: {cubeColumn.myColumnName}");
+                }
+            }
+        }
+
+        public static void getDatabaseInfo(Database myDatabase)
+        {
+            Console.WriteLine($"Found the database {myDatabase._databaseDs._dsInitCatalog}");
+            Console.WriteLine($"Found the connection string {myDatabase._databaseDs._dsConnString}.");
+            Console.WriteLine($"Found the initial catalog {myDatabase._databaseDs._dsInitCatalog}");
+            foreach (Table dbTable in myDatabase._databaseTables)
+            {
+                Console.WriteLine($"Found the table {dbTable._tableName}");
+                Console.WriteLine("Column list:");
+                foreach (Column column in dbTable.columnList)
+                {
+                    Console.WriteLine($"Column: {column.myColumnName}");
                 }
             }
         }
