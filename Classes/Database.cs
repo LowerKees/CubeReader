@@ -60,9 +60,37 @@ namespace Classes
                 table._tableName = x.InnerText;
 
                 tables.Add(table);
+                Console.WriteLine($"Found table {x.InnerText}");
 
-                Console.WriteLine($"Found node {x.InnerText}");
-                
+                string xPathCols = xPath.Replace("]/@Name", $" and @Name='{x.InnerText}']");
+                xPathCols += "/~ns~:Relationship/~ns~:Entry/~ns~:Element[@Type='SqlSimpleColumn']/@Name";
+
+                XmlNodeList columns;
+                if (root.Attributes["xmlns"] != null)
+                {
+                    string xmlns = root.Attributes["xmlns"].Value;
+                    XmlNamespaceManager nsmgr = new XmlNamespaceManager(myDatabase.NameTable);
+
+                    string xmlnsName = "cubeReading";
+                    nsmgr.AddNamespace(xmlnsName, xmlns);
+
+                    // create correct xPath expression
+                    xPathCols = xPathCols.Replace("~ns~", xmlnsName);
+
+                    columns = root.SelectNodes(xPathCols, nsmgr);
+                }
+                else
+                {
+                    columns = root.SelectNodes(xPathCols);
+                }
+
+                foreach(XmlNode c in columns)
+                {
+                    Column column = new Column();
+                    column.myColumnName = c.InnerText;
+                    table.AddColumn(column);
+                    Console.WriteLine($"Found column {c.InnerText} and added it to the table.");
+                }
             }
 
             return tables;
