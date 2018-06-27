@@ -195,6 +195,7 @@ namespace Classes
             return initCat;
         }
 
+        // TODO: method slaat nergens op
         private static XmlDocument loadCube(string cubePath)
         {
             XmlDocument myXmlCube = new XmlDocument();
