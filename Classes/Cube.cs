@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.IO;
+using Classes;
 
 namespace Classes
 {
     public class Cube
     {
         private List<CubeTable> cubeTables;
-        private DataSource cubeDs;
+        private List<DataSource> cubeDs;
         private string cubeName;
 
         public Cube(string cubePath)
@@ -32,7 +33,7 @@ namespace Classes
             }
         }
 
-        public DataSource _cubeDs
+        public List<DataSource> _cubeDs
         {
             get
             {
@@ -54,25 +55,7 @@ namespace Classes
             string xDimPath = "/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database/~ns~:Dimensions/~ns~:Dimension";
             string xPath = "/~ns~:Attributes/~ns~:Attribute/~ns~:KeyColumns/~ns~:KeyColumn/~ns~:Source";
 
-            if (root.Attributes["xmlns"] != null)
-            {
-                string xmlns = root.Attributes["xmlns"].Value;
-                XmlNamespaceManager nsmgr = new XmlNamespaceManager(myXmlCube.NameTable);
-
-                string xmlnsName = "cubeReading";
-                nsmgr.AddNamespace(xmlnsName, xmlns);
-
-                // create correct xPath expression
-                xPath = xDimPath + xPath;
-                xPath = xPath.Replace("~ns~", xmlnsName);
-                
-                nodes = root.SelectNodes(xPath, nsmgr);
-            }
-            else
-            {
-                xPath = xPath.Replace("~ns~:", string.Empty);
-                nodes = root.SelectNodes(xPath);
-            }
+            nodes = ArtifactReader.getArtifactNodes(xPath, myXmlCube, xDimPath);
 
             string checkNode = null;
             foreach (XmlNode node in nodes)
@@ -97,48 +80,33 @@ namespace Classes
             return foundTables;
         }
 
-        private DataSource getCubeDataSource(string cubePath)
+        private List<DataSource> getCubeDataSource(string cubePath)
         {
-            DataSource myDataSource = new DataSource();
+            List<DataSource> myDataSources = new List<DataSource>();
 
+            // Load current cube
             XmlDocument myXmlCube = new XmlDocument();
             myXmlCube = loadCube(cubePath);
 
-            // Determine xpath to search for dsv
+            //// Determine xpath to search for dsv
             XmlNodeList nodes;
             string xBasePath = "/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database";
             string xPath = "/~ns~:DataSources/~ns~:DataSource/~ns~:ConnectionString";
-            XmlNode root = myXmlCube.DocumentElement;
 
-            if (root.Attributes["xmlns"] != null)
+            // Return nodes with data source(s)
+            nodes = ArtifactReader.getArtifactNodes(xBasePath, myXmlCube, xPath);
+
+            // TODO: Check for multiple connection stringsB
+            foreach (XmlNode node in nodes)
             {
-                string xmlns = root.Attributes["xmlns"].Value;
-                XmlNamespaceManager nsmgr = new XmlNamespaceManager(myXmlCube.NameTable);
+                DataSource dataSource = new DataSource();
+                dataSource._dsConnString = node.InnerText;
+                dataSource._dsInitCatalog = getCubeInitialCatalog(dataSource);
 
-                string xmlnsName = "cubeReading";
-                nsmgr.AddNamespace(xmlnsName, xmlns);
-
-                // create correct xPath expression
-                xPath = xBasePath + xPath;
-                xPath = xPath.Replace("~ns~", xmlnsName);
-
-                nodes = root.SelectNodes(xPath, nsmgr);
+                myDataSources.Add(dataSource);
             }
-            else
-            {
-                xPath = xPath.Replace("~ns~:", string.Empty);
-                nodes = root.SelectNodes(xPath);
-            }
-
-            // TODO: Check for multiple connection strings
-            foreach(XmlNode node in nodes)
-            {
-                myDataSource._dsConnString = node.InnerText;
-            }
-
-            myDataSource._dsInitCatalog = getCubeInitialCatalog(myDataSource);
             
-            return myDataSource;
+            return myDataSources;
         }
 
         private string getCubeName(string cubePath)
@@ -149,27 +117,21 @@ namespace Classes
             XmlNode root = myXmlCube.DocumentElement;
 
             // Determine xpath to search for cube name
-            XmlNode nameNode;
+            XmlNodeList nameNodes;
             string xNamePath = "/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database/~ns~:Name";
 
-            if (root.Attributes["xmlns"] != null)
+            nameNodes = ArtifactReader.getArtifactNodes(xNamePath, myXmlCube);
+
+            if(nameNodes.Count == 1)
             {
-                string xmlns = root.Attributes["xmlns"].Value;
-                XmlNamespaceManager nsmgr = new XmlNamespaceManager(myXmlCube.NameTable);
-
-                string xmlnsName = "cubeReading";
-                nsmgr.AddNamespace(xmlnsName, xmlns);
-
-                xNamePath = xNamePath.Replace("~ns~", xmlnsName);
-                nameNode = root.SelectSingleNode(xNamePath, nsmgr);
+                return nameNodes.Item(0).ToString();
             }
             else
             {
-                xNamePath = xNamePath.Replace("~ns~:", string.Empty);
-                nameNode = root.SelectSingleNode(xNamePath);
+                // TODO: throw error
+                Console.WriteLine("Multiple names where found for a cube. No name was passed to the cube property.");
+                return null;
             }
-
-            return nameNode.InnerText;
         }
 
         private string getCubeInitialCatalog(DataSource datasource)
