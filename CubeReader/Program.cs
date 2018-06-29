@@ -132,8 +132,12 @@ namespace CubeReader
         public static void getCubeInfo(Cube myCube)
         {
             Console.WriteLine($"Found the cube {myCube._cubeName}");
-            Console.WriteLine($"Found the connection string {myCube._cubeDs._dsConnString}.");
-            Console.WriteLine($"Found the initial catalog {myCube._cubeDs._dsInitCatalog}");
+            foreach (DataSource dataSource in myCube._cubeDs)
+            {
+                Console.WriteLine($"Found the connection string {dataSource._dsConnString}.");
+                Console.WriteLine($"Found the initial catalog {dataSource._dsInitCatalog}");
+            }
+
             foreach (CubeTable cubeTable in myCube._cubeTables)
             {
                 Console.WriteLine($"Found the table {cubeTable._tableName}");

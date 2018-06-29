@@ -33,26 +33,8 @@ namespace Classes
             // Determine xpath to search for dsv
             XmlNodeList nodes;
             string xPath = "/~ns~:DataSchemaModel/~ns~:Model/~ns~:Element[@Type='SqlTable']/@Name";
-            XmlNode root = myDatabase.DocumentElement;
 
-            if (root.Attributes["xmlns"] != null)
-            {
-                string xmlns = root.Attributes["xmlns"].Value;
-                XmlNamespaceManager nsmgr = new XmlNamespaceManager(myDatabase.NameTable);
-
-                string xmlnsName = "cubeReading";
-                nsmgr.AddNamespace(xmlnsName, xmlns);
-
-                // create correct xPath expression
-                xPath = xPath.Replace("~ns~", xmlnsName);
-
-                nodes = root.SelectNodes(xPath, nsmgr);
-            }
-            else
-            {
-                xPath = xPath.Replace("~ns~:", string.Empty);
-                nodes = root.SelectNodes(xPath);
-            }
+            nodes = ArtifactReader.getArtifactNodes(xPath, myDatabase);
 
             foreach(XmlNode x in nodes)
             {
@@ -66,23 +48,8 @@ namespace Classes
                 xPathCols += "/~ns~:Relationship/~ns~:Entry/~ns~:Element[@Type='SqlSimpleColumn']/@Name";
 
                 XmlNodeList columns;
-                if (root.Attributes["xmlns"] != null)
-                {
-                    string xmlns = root.Attributes["xmlns"].Value;
-                    XmlNamespaceManager nsmgr = new XmlNamespaceManager(myDatabase.NameTable);
 
-                    string xmlnsName = "cubeReading";
-                    nsmgr.AddNamespace(xmlnsName, xmlns);
-
-                    // create correct xPath expression
-                    xPathCols = xPathCols.Replace("~ns~", xmlnsName);
-
-                    columns = root.SelectNodes(xPathCols, nsmgr);
-                }
-                else
-                {
-                    columns = root.SelectNodes(xPathCols);
-                }
+                columns = ArtifactReader.getArtifactNodes(xPathCols, myDatabase);
 
                 foreach(XmlNode c in columns)
                 {
@@ -108,26 +75,8 @@ namespace Classes
             // Determine xpath to search for dsv
             XmlNodeList nodes;
             string xPath = "/~ns~:DacType/~ns~:Name";
-            XmlNode root = myDatabase.DocumentElement;
 
-            if (root.Attributes["xmlns"] != null)
-            {
-                string xmlns = root.Attributes["xmlns"].Value;
-                XmlNamespaceManager nsmgr = new XmlNamespaceManager(myDatabase.NameTable);
-
-                string xmlnsName = "cubeReading";
-                nsmgr.AddNamespace(xmlnsName, xmlns);
-
-                // create correct xPath expression
-                xPath = xPath.Replace("~ns~", xmlnsName);
-
-                nodes = root.SelectNodes(xPath, nsmgr);
-            }
-            else
-            {
-                xPath = xPath.Replace("~ns~:", string.Empty);
-                nodes = root.SelectNodes(xPath);
-            }
+            nodes = ArtifactReader.getArtifactNodes(xPath, myDatabase);
 
             foreach (XmlNode x in nodes)
             {
