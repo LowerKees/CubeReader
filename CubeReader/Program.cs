@@ -107,6 +107,9 @@ namespace CubeReader
                     Console.WriteLine($"An error occured while reading dacpac model.xml files: {e.Message}");
                 }
 
+                // TODO: create matching algorithm
+
+                // TODO: create result log
 
                 // TODO: remove debug statement
                 Console.ReadKey();
@@ -156,7 +159,7 @@ namespace CubeReader
             Console.WriteLine($"Found the initial catalog {myDatabase._databaseDs._dsInitCatalog}");
             foreach (Table dbTable in myDatabase._databaseTables)
             {
-                Console.WriteLine($"Found the table {dbTable._tableName}");
+                Console.WriteLine($"Found the {dbTable._tableType} {dbTable._tableName}");
                 Console.WriteLine("Column list:");
                 foreach (Column column in dbTable.columnList)
                 {

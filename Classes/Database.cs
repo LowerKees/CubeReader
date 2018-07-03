@@ -13,17 +13,19 @@ namespace Classes
     {
         private DataSource databaseDs;
         private List<Table> databaseTables;
+        private List<Table> databaseViews;
 
         public Database(string modelPath)
         {
             databaseDs = getDbDataSource(modelPath);
-            databaseTables = getDbTables(modelPath);
+            databaseTables = getDbTables(modelPath, "table");
+            databaseViews = getDbTables(modelPath, "view");
         }
 
         public DataSource _databaseDs { get { return databaseDs; } }
         public List<Table> _databaseTables { get { return databaseTables; } }
 
-        private List<Table> getDbTables(string modelPath)
+        private List<Table> getDbTables(string modelPath, string tableOrView)
         {
             List<Table> tables = new List<Table>();
 
@@ -32,7 +34,7 @@ namespace Classes
 
             // Determine xpath to search for dsv
             XmlNodeList nodes;
-            string xPath = "/~ns~:DataSchemaModel/~ns~:Model/~ns~:Element[@Type='SqlTable']/@Name";
+            string xPath = tableOrView == "table" ? "/~ns~:DataSchemaModel/~ns~:Model/~ns~:Element[@Type='SqlTable']/@Name" : "/~ns~:DataSchemaModel/~ns~:Model/~ns~:Element[@Type='SqlView']/@Name";
 
             nodes = ArtifactReader.getArtifactNodes(xPath, myDatabase);
 
@@ -40,12 +42,13 @@ namespace Classes
             {
                 Table table = new Table();
                 table._tableName = x.InnerText;
+                table._tableType = tableOrView == "table" ? "table" : "view";
 
                 tables.Add(table);
                 Console.WriteLine($"Found table {x.InnerText}");
 
                 string xPathCols = xPath.Replace("]/@Name", $" and @Name='{x.InnerText}']");
-                xPathCols += "/~ns~:Relationship/~ns~:Entry/~ns~:Element[@Type='SqlSimpleColumn']/@Name";
+                xPathCols += tableOrView == "table" ? "/~ns~:Relationship/~ns~:Entry/~ns~:Element[@Type='SqlSimpleColumn']/@Name" : "/~ns~:Relationship/~ns~:Entry/~ns~:Element[@Type='SqlComputedColumn']/@Name";
 
                 XmlNodeList columns;
 
@@ -56,7 +59,7 @@ namespace Classes
                     Column column = new Column();
                     column.myColumnName = c.InnerText;
                     table.AddColumn(column);
-                    Console.WriteLine($"Found column {c.InnerText} and added it to the table.");
+                    Console.WriteLine($"Found column {c.InnerText} and added it to the {tableOrView}.");
                 }
             }
 
