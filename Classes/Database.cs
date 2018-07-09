@@ -62,7 +62,6 @@ namespace Classes
                     Console.WriteLine($"Found column {c.InnerText} and added it to the {tableOrView}.");
                 }
             }
-
             return tables;
         }
 

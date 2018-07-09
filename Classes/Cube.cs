@@ -124,7 +124,7 @@ namespace Classes
 
             if(nameNodes.Count == 1)
             {
-                return nameNodes.Item(0).ToString();
+                return nameNodes.Item(0).InnerText.ToString();
             }
             else
             {

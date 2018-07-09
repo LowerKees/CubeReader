@@ -96,7 +96,7 @@ namespace CubeReader
                             Database database = new Database(file);
 
                             // Print info to client
-                            getDatabaseInfo(database);
+                            // getDatabaseInfo(database);
 
                             compareDatabaseList.Add(database);
                         }
@@ -108,6 +108,14 @@ namespace CubeReader
                 }
 
                 // TODO: create matching algorithm
+                try
+                {
+                    Matching.matchCubeToDatbase(compareDatabaseList, compareCubeList);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"An error occured while matching databases and cubes: {e.Message}");
+                }
 
                 // TODO: create result log
 
