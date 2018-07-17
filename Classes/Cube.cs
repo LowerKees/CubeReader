@@ -94,7 +94,7 @@ namespace Classes
             string xPath = "/~ns~:DataSources/~ns~:DataSource/~ns~:ConnectionString";
 
             // Return nodes with data source(s)
-            nodes = ArtifactReader.getArtifactNodes(xBasePath, myXmlCube, xPath);
+            nodes = ArtifactReader.getArtifactNodes(xPath, myXmlCube, xBasePath);
 
             // TODO: Check for multiple connection stringsB
             foreach (XmlNode node in nodes)
