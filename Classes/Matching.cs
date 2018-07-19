@@ -16,7 +16,11 @@ namespace Classes
 
                 foreach (DataSource ds in cube._cubeDs)
                 {
-                    Console.WriteLine("Found connection string {0}", databases.Find(x => x._databaseDs._dsConnString.Equals(ds._dsConnString)));
+                    Database db = new Database();
+                    // Compare based on Initial Catalog because
+                    // databases have no connection string
+                    db = databases.Find(x => x._databaseDs._dsInitCatalog.Equals(ds._dsInitCatalog));
+                    Console.WriteLine($"The cube {cube._cubeName} connects to database {db._databaseDs._dsInitCatalog}");
                 }
             }
         }

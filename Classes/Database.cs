@@ -22,6 +22,13 @@ namespace Classes
             databaseViews = getDbTables(modelPath, "view");
         }
 
+        public Database()
+        {
+            databaseDs = null;
+            databaseTables = null;
+            databaseViews = null;
+        }
+
         public DataSource _databaseDs { get { return databaseDs; } }
         public List<Table> _databaseTables { get { return databaseTables; } }
 

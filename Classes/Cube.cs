@@ -23,7 +23,13 @@ namespace Classes
             this.cubeName = getCubeName(cubePath);
         }
 
-        public string _cubeName { get; }
+        public string _cubeName
+        {
+            get
+            {
+                return cubeName;
+            }
+        }
 
         public List<CubeTable> _cubeTables
         {
