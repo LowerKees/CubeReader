@@ -9,7 +9,9 @@ namespace Classes
     public class Table
     {
         public List<Column> columnList;
+        private string tableType;
 
+        public string _tableType { get; set; }
         public string _tableName { get; set; }
 
         public Table()

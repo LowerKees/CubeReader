@@ -23,7 +23,13 @@ namespace Classes
             this.cubeName = getCubeName(cubePath);
         }
 
-        public string _cubeName { get; }
+        public string _cubeName
+        {
+            get
+            {
+                return cubeName;
+            }
+        }
 
         public List<CubeTable> _cubeTables
         {
@@ -94,7 +100,7 @@ namespace Classes
             string xPath = "/~ns~:DataSources/~ns~:DataSource/~ns~:ConnectionString";
 
             // Return nodes with data source(s)
-            nodes = ArtifactReader.getArtifactNodes(xBasePath, myXmlCube, xPath);
+            nodes = ArtifactReader.getArtifactNodes(xPath, myXmlCube, xBasePath);
 
             // TODO: Check for multiple connection stringsB
             foreach (XmlNode node in nodes)
@@ -124,7 +130,7 @@ namespace Classes
 
             if(nameNodes.Count == 1)
             {
-                return nameNodes.Item(0).ToString();
+                return nameNodes.Item(0).InnerText.ToString();
             }
             else
             {
