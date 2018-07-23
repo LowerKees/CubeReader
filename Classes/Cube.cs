@@ -66,22 +66,38 @@ namespace Classes
             string checkNode = null;
             foreach (XmlNode node in nodes)
             {
-                CubeTable currentTable = foundTables.Find(x => x._tableName.Equals(node.FirstChild.InnerText));
+                CubeTable currentTable = foundTables.Find(x => x._cubeTableName.Equals(node.FirstChild.InnerText));
                 // Check if a new table is presented
                 if (currentTable is null)
                 {
+                    // Add cube table
                     currentTable = new CubeTable();
-                    currentTable._tableName = node.FirstChild.InnerText;
-                    checkNode = currentTable._tableName;
+                    currentTable._cubeTableName = node.FirstChild.InnerText;
+                    checkNode = currentTable._cubeTableName;
 
+                    // Add db ref table
+                    
+                    // Find db table name and schema
+                    XmlNodeList trueTables;
+                    xPath = $"/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database/~ns~:DataSourceViews/~ns~:DataSourceView/~ns~:Schema/xs:schema/xs:element/xs:complexType/xs:choice/xs:element[@name=\'{node.FirstChild.InnerText}\']";
+                    trueTables = ArtifactReader.getArtifactNodes(xPath, myXmlCube);
+
+                    // Add findings to property list
+                    string trueTableName, trueSchemaName;
+                    trueTableName = trueTables.Item(0).Attributes.GetNamedItem("msprop:DbTableName").Value.ToString();
+                    trueSchemaName = trueTables.Item(0).Attributes.GetNamedItem("msprop:DbSchemaName").Value.ToString();
+                    currentTable._tableName = trueSchemaName + "." + trueTableName;
+                    
                     // Add table to output
                     foundTables.Add(currentTable);
                 }
-
+                
                 // Add columns to table
                 CubeColumn myColumn = new CubeColumn();
                 myColumn.myColumnName = node.LastChild.InnerText;
                 currentTable.AddColumn(myColumn);
+
+                // TODO: find db column names
             }
             return foundTables;
         }
@@ -128,7 +144,7 @@ namespace Classes
 
             nameNodes = ArtifactReader.getArtifactNodes(xNamePath, myXmlCube);
 
-            if(nameNodes.Count == 1)
+            if(nameNodes.Count > 1)
             {
                 return nameNodes.Item(0).InnerText.ToString();
             }
