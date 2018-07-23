@@ -19,16 +19,30 @@ namespace Classes
 
             if (root.Attributes["xmlns"] != null)
             {
+                // TODO: toevoegen van de juiste namespace en bijbehorende value
                 string xmlns = root.Attributes["xmlns"].Value;
                 XmlNamespaceManager nsmgr = new XmlNamespaceManager(xml.NameTable);
 
-                string xmlnsName = "cubeReading";
-                nsmgr.AddNamespace(xmlnsName, xmlns);
+                string nsCubeReading = "cubeReading";
+                nsmgr.AddNamespace(nsCubeReading, xmlns);
+
+                string ns = "xs";
+                xmlns = "http://www.w3.org/2001/XMLSchema";
+
+                nsmgr.AddNamespace(ns, xmlns);
+
+                ns = "msprop";
+                xmlns = "urn:schemas-microsoft-com:xml-msprop";
+
+                nsmgr.AddNamespace(ns, xmlns);
 
                 // create correct xPath expression
-                xPath = baseXPath + xPath;
-                xPath = xPath.Replace("~ns~", xmlnsName);
-
+                if (baseXPath != null)
+                {
+                    xPath = baseXPath + xPath;
+                }
+                
+                xPath = xPath.Replace("~ns~", nsCubeReading);
                 nodes = root.SelectNodes(xPath, nsmgr);
             }
             else
