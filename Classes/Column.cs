@@ -19,7 +19,7 @@ namespace Classes
             this.dataTypeScale = Scale;
         }
 
-        public string myColumnName
+        public string _ColumnName
         {
             get { return columnName; }
             set { columnName = value; }

@@ -107,17 +107,18 @@ namespace CubeReader
                     Console.WriteLine($"An error occured while reading dacpac model.xml files: {e.Message}");
                 }
 
-                // TODO: create matching algorithm
+                // Match cubes and databases in list of matches
                 try
                 {
-                    Matching.matchCubeToDatbase(compareDatabaseList, compareCubeList);
+                    List<Matching> matches = new List<Matching>();
+                    matches = Matching.matchCubeToDatabase(compareDatabaseList, compareCubeList);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine($"An error occured while matching databases and cubes: {e.Message}");
                 }
 
-                // TODO: create result log
+                // Run matching checks
 
                 // TODO: remove debug statement
                 Console.ReadKey();
@@ -151,11 +152,11 @@ namespace CubeReader
 
             foreach (CubeTable cubeTable in myCube._cubeTables)
             {
-                Console.WriteLine($"Found the table {cubeTable._tableName}");
+                Console.WriteLine($"Found the table {cubeTable._cubeTableName} referencing {cubeTable._tableName}");
                 Console.WriteLine("Column list:");
-                foreach (Column cubeColumn in cubeTable.columnList)
+                foreach (CubeColumn cubeColumn in cubeTable.columnList)
                 {
-                    Console.WriteLine($"Column: {cubeColumn.myColumnName}");
+                    Console.WriteLine($"Cube column: {cubeColumn._cubeColumnName} referencing db column {cubeColumn._ColumnName}");
                 }
             }
         }
@@ -171,7 +172,7 @@ namespace CubeReader
                 Console.WriteLine("Column list:");
                 foreach (Column column in dbTable.columnList)
                 {
-                    Console.WriteLine($"Column: {column.myColumnName}");
+                    Console.WriteLine($"Column: {column._ColumnName}");
                 }
             }
         }

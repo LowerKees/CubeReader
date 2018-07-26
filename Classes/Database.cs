@@ -64,7 +64,7 @@ namespace Classes
                 foreach(XmlNode c in columns)
                 {
                     Column column = new Column();
-                    column.myColumnName = c.InnerText;
+                    column._ColumnName = c.InnerText;
                     table.AddColumn(column);
                     Console.WriteLine($"Found column {c.InnerText} and added it to the {tableOrView}.");
                 }
