@@ -92,12 +92,18 @@ namespace Classes
                     foundTables.Add(currentTable);
                 }
                 
-                // Add columns to table
+                // Add cube columns to table
                 CubeColumn myColumn = new CubeColumn();
-                myColumn.myColumnName = node.LastChild.InnerText;
-                currentTable.AddColumn(myColumn);
+                myColumn._cubeColumnName = node.LastChild.InnerText;
+                
+                // Find matching db column name
+                XmlNodeList trueColumns;
+                xPath = $"/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database/~ns~:DataSourceViews/~ns~:DataSourceView/~ns~:Schema/xs:schema/xs:element/xs:complexType/xs:choice/xs:element[@name=\'{currentTable._cubeTableName}\']/xs:complexType/xs:sequence/xs:element[@name=\'{node.LastChild.InnerText}\']";
+                trueColumns = ArtifactReader.getArtifactNodes(xPath, myXmlCube);
+                string trueColumnName = trueColumns.Item(0).Attributes.GetNamedItem("msprop:DbColumnName").Value.ToString();
 
-                // TODO: find db column names
+                myColumn._ColumnName = trueColumnName;
+                currentTable.AddColumn(myColumn);
             }
             return foundTables;
         }
