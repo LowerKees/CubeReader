@@ -150,7 +150,7 @@ namespace Classes
 
             nameNodes = ArtifactReader.getArtifactNodes(xNamePath, myXmlCube);
 
-            if(nameNodes.Count > 1)
+            if(nameNodes.Count == 1)
             {
                 return nameNodes.Item(0).InnerText.ToString();
             }

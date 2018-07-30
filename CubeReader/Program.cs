@@ -50,7 +50,7 @@ namespace CubeReader
                 }
                 catch (Exception e) 
                 {
-                    Console.WriteLine($"An error occured while reading the cube: {e.Message}");
+                    throw;
                 }
 
                 // Unpack.dacpac files
@@ -81,7 +81,7 @@ namespace CubeReader
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"An error occured while unpacking dacpac files: {e.Message}");
+                    throw;
                 }
 
                 // Read the model.xml file from the dacpac into memory
@@ -104,21 +104,36 @@ namespace CubeReader
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"An error occured while reading dacpac model.xml files: {e.Message}");
+                    throw;
                 }
 
                 // Match cubes and databases in list of matches
+                List<Matching> matches = new List<Matching>();
                 try
                 {
-                    List<Matching> matches = new List<Matching>();
                     matches = Matching.matchCubeToDatabase(compareDatabaseList, compareCubeList);
+                }
+                catch (MatchException me)
+                {
+                    throw;
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"An error occured while matching databases and cubes: {e.Message}");
-                }
+                    throw;
+                }          
 
                 // Run matching checks
+                try
+                {
+                    foreach (Matching match in matches)
+                    {
+                        match.checkForTables(match);
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw;
+                }
 
                 // TODO: remove debug statement
                 Console.ReadKey();

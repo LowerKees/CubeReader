@@ -55,7 +55,15 @@ namespace Classes
                     Database db = new Database();
                     // Compare based on Initial Catalog because
                     // databases have no connection string
+                    
                     db = databases.Find(x => x._databaseDs._dsInitCatalog.Equals(ds._dsInitCatalog));
+                    
+                    if(db == null)
+                    {
+                        MatchException matchException = new MatchException($"The cube {cube._cubeName} has no corresponding databases.");
+                        throw matchException;
+                    }
+                    
                     Console.WriteLine($"The cube {cube._cubeName} connects to database {db._databaseDs._dsInitCatalog}");
                     match.matchedDatabases.Add(db);
                 }
@@ -64,6 +72,45 @@ namespace Classes
             }
 
             return matches;
+        }
+
+        public void checkForTables(Matching match)
+        {
+            string checkName = "100. Cube vs Database table test";
+            Console.WriteLine($"Running check {checkName}: \n Checking if all cube tables have corresponding database tables.");
+            
+            foreach(CubeTable cubeTable in match.matchingCube._cubeTables)
+            {
+                Boolean isPresent = false;
+                List<Table> nonMatchedTables = new List<Table>();
+
+                foreach(Database db in match.matchedDatabases)
+                {
+                    foreach(Table table in db._databaseTables)
+                    {
+                        if(table._tableName.Equals(cubeTable._tableName))
+                        {
+                            isPresent = true;
+                        }
+                        else
+                        {
+                            nonMatchedTables.Add(table);
+                        }
+                    }
+                }
+
+                if (!isPresent && nonMatchedTables.Count > 0)
+                {
+                    MatchException matchException = new MatchException($"Error: One or more cube tables cannot be found in the dacpac");
+                    Console.WriteLine($"For cube {match.matchingCube} the following tables cannot be found in the dacpacs:");
+                    foreach (Table table in nonMatchedTables)
+                    {
+                        Console.WriteLine($"\n{table}");
+                    }
+
+                    throw matchException;
+                }
+            }
         }
     }
 }
