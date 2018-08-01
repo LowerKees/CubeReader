@@ -115,7 +115,7 @@ namespace CubeReader
                 }
                 catch (MatchException me)
                 {
-                    throw;
+                    Console.WriteLine(me.Message); 
                 }
                 catch (Exception e)
                 {
@@ -128,11 +128,12 @@ namespace CubeReader
                     foreach (Matching match in matches)
                     {
                         match.checkForTables(match);
+                        match.checkForColumns(match);
                     }
                 }
                 catch (Exception e)
                 {
-                    throw;
+                    Console.WriteLine(e.Message); 
                 }
 
                 // TODO: remove debug statement

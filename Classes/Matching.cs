@@ -77,40 +77,148 @@ namespace Classes
         public void checkForTables(Matching match)
         {
             string checkName = "100. Cube vs Database table test";
-            Console.WriteLine($"Running check {checkName}: \n Checking if all cube tables have corresponding database tables.");
-            
-            foreach(CubeTable cubeTable in match.matchingCube._cubeTables)
+            Console.WriteLine($"Running check {checkName}: \nChecking if all cube tables have corresponding database tables.");
+            List<CubeTable> nonMatchedTables = new List<CubeTable>();
+
+            foreach (CubeTable cubeTable in match.matchingCube._cubeTables)
             {
                 Boolean isPresent = false;
-                List<Table> nonMatchedTables = new List<Table>();
 
                 foreach(Database db in match.matchedDatabases)
                 {
                     foreach(Table table in db._databaseTables)
                     {
-                        if(table._tableName.Equals(cubeTable._tableName))
+                        if(table._tableName.ToUpper().Equals(cubeTable._tableName.ToUpper()))
                         {
                             isPresent = true;
                         }
-                        else
+                    }
+
+                    foreach(Table view in db._databaseViews)
+                    {
+                        if(view._tableName.ToUpper().Equals(cubeTable._tableName.ToUpper()))
                         {
-                            nonMatchedTables.Add(table);
+                            isPresent = true;
                         }
                     }
                 }
 
-                if (!isPresent && nonMatchedTables.Count > 0)
+                if (!isPresent)
                 {
-                    MatchException matchException = new MatchException($"Error: One or more cube tables cannot be found in the dacpac");
-                    Console.WriteLine($"For cube {match.matchingCube} the following tables cannot be found in the dacpacs:");
-                    foreach (Table table in nonMatchedTables)
-                    {
-                        Console.WriteLine($"\n{table}");
-                    }
-
-                    throw matchException;
+                    nonMatchedTables.Add(cubeTable);
                 }
             }
+
+            if (nonMatchedTables.Count > 0)
+            {
+                MatchException matchException = new MatchException($"Error: One or more cube tables cannot be found in the dacpac. Checkname: {checkName}");
+                Console.WriteLine($"For cube {match.matchingCube._cubeName} the following tables cannot be found in the dacpacs:");
+                foreach (Table table in nonMatchedTables)
+                {
+                    Console.WriteLine($"\n{table._tableName}");
+                }
+
+                throw matchException;
+            }
+            else
+            {
+                showTestSuccess(checkName);
+            }
+        }
+
+        public void checkForColumns(Matching match)
+        {
+            string checkName = "101. Cube vs Database column test";
+            Console.WriteLine($"Running check {checkName}: \nChecking if all cube table columns have corresponding database columns.");
+            List<CubeTable> nonPresentColumnTables = new List<CubeTable>();
+
+            foreach(CubeTable cubeTable in match.matchingCube._cubeTables)
+            {
+                foreach(Database database in match.matchedDatabases)
+                {
+                    // Find all tables in matched databases
+                    // that correspond with the cube table
+                    var tableFound = from table in database._databaseTables
+                                     where table._tableName.ToUpper().Equals(cubeTable._tableName.ToUpper())
+                                     select table;
+
+                    // Find all views in matched databases
+                    var viewFound = from view in database._databaseViews
+                                    where view._tableName.ToUpper().Equals(cubeTable._tableName.ToUpper())
+                                    select view;
+
+                    if(tableFound.Count() > 0)
+                    {
+                        foreach(CubeColumn cubeColumn in cubeTable.columnList)
+                        {
+                            foreach(Table table in tableFound)
+                            {
+                                var columnNotFound = from column in table.columnList
+                                                     where !(column._ColumnName.ToUpper().Equals(cubeColumn._ColumnName.ToUpper()))
+                                                     select column;
+
+                                foreach(var column in columnNotFound)
+                                {
+                                    CubeTable notFoundTable = new CubeTable();
+                                    notFoundTable.columnList.Add(column);
+                                    notFoundTable._cubeTableName = cubeTable._cubeTableName;
+
+                                    nonPresentColumnTables.Add(notFoundTable);
+                                }
+                            }
+                        }
+                    }
+
+                    if(viewFound.Count() > 0)
+                    {
+                        foreach (CubeColumn cubeColumn in cubeTable.columnList)
+                        {
+                            foreach (Table table in viewFound)
+                            {
+                                var columnNotFound = from column in table.columnList
+                                                     where !(column._ColumnName.Equals(cubeColumn._ColumnName))
+                                                     select column;
+
+                                foreach (var column in columnNotFound)
+                                {
+                                    CubeTable notFoundTable = new CubeTable();
+                                    notFoundTable.columnList.Add(column);
+                                    notFoundTable._cubeTableName = cubeTable._cubeTableName;
+
+                                    nonPresentColumnTables.Add(notFoundTable);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (nonPresentColumnTables.Count() == 0)
+            {
+                showTestSuccess(checkName);
+            }
+            else
+            {
+                foreach (CubeTable table in nonPresentColumnTables)
+                {
+                    foreach (Column column in table.columnList)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"Cube table {table._tableName}'s column {column._ColumnName} " +
+                            $"cannot be matched with the presented databases.");
+                    }
+                }
+            }
+
+            
+
+        }
+
+        public static void showTestSuccess(string checkName)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"\nCheck {checkName} passed!");
+            Console.ResetColor();
         }
     }
 }
