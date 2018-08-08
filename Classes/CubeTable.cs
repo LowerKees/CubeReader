@@ -8,7 +8,7 @@ namespace Classes
 {
     public class CubeTable : Table
     {
-        public string _cubeTableName
+        public string CubeTableName
         {
             get;
             set;

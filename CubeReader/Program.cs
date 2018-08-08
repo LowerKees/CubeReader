@@ -108,10 +108,10 @@ namespace CubeReader
                 }
 
                 // Match cubes and databases in list of matches
-                List<Matching> matches = new List<Matching>();
+                List<Match> matches = new List<Match>();
                 try
                 {
-                    matches = Matching.matchCubeToDatabase(compareDatabaseList, compareCubeList);
+                    matches = Match.MatchCubeToDatabase(compareDatabaseList, compareCubeList);
                 }
                 catch (MatchException me)
                 {
@@ -125,10 +125,10 @@ namespace CubeReader
                 // Run matching checks
                 try
                 {
-                    foreach (Matching match in matches)
+                    foreach (Match match in matches)
                     {
-                        match.checkForTables(match);
-                        match.checkForColumns(match);
+                        match.CheckForTables(match);
+                        match.CheckForColumns(match);
                     }
                 }
                 catch (Exception e)
@@ -168,9 +168,9 @@ namespace CubeReader
 
             foreach (CubeTable cubeTable in myCube._cubeTables)
             {
-                Console.WriteLine($"Found the table {cubeTable._cubeTableName} referencing {cubeTable._tableName}");
+                Console.WriteLine($"Found the table {cubeTable.CubeTableName} referencing {cubeTable.TableName}");
                 Console.WriteLine("Column list:");
-                foreach (CubeColumn cubeColumn in cubeTable.columnList)
+                foreach (CubeColumn cubeColumn in cubeTable.ColumnList)
                 {
                     Console.WriteLine($"Cube column: {cubeColumn._cubeColumnName} referencing db column {cubeColumn._ColumnName}");
                 }
@@ -184,9 +184,9 @@ namespace CubeReader
             Console.WriteLine($"Found the initial catalog {myDatabase._databaseDs._dsInitCatalog}");
             foreach (Table dbTable in myDatabase._databaseTables)
             {
-                Console.WriteLine($"Found the {dbTable._tableType} {dbTable._tableName}");
+                Console.WriteLine($"Found the {dbTable.TableType} {dbTable.TableName}");
                 Console.WriteLine("Column list:");
-                foreach (Column column in dbTable.columnList)
+                foreach (Column column in dbTable.ColumnList)
                 {
                     Console.WriteLine($"Column: {column._ColumnName}");
                 }

@@ -49,8 +49,8 @@ namespace Classes
             foreach(XmlNode x in nodes)
             {
                 Table table = new Table();
-                table._tableName = x.InnerText.Replace("[","").Replace("]","");
-                table._tableType = tableOrView == "table" ? "table" : "view";
+                table.TableName = x.InnerText.Replace("[","").Replace("]","");
+                table.TableType = tableOrView == "table" ? "table" : "view";
 
                 tables.Add(table);
                 Console.WriteLine($"Found table {x.InnerText}");
