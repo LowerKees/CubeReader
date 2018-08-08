@@ -16,11 +16,21 @@ namespace Classes
         private List<DataSource> cubeDs;
         private string cubeName;
 
+        // For constructing cubes from file
         public Cube(string cubePath)
         {
             this.cubeTables = GetCubeTables(cubePath);
             this.cubeDs = getCubeDataSource(cubePath);
             this.cubeName = getCubeName(cubePath);
+        }
+
+        // For constructing cubes in the
+        // Matching class
+        public Cube(string cubeName, List<CubeTable> cubeTables)
+        {
+            this.cubeTables = cubeTables;
+            this.cubeDs = null;
+            this.cubeName = cubeName;
         }
 
         public string _cubeName
@@ -66,14 +76,14 @@ namespace Classes
             string checkNode = null;
             foreach (XmlNode node in nodes)
             {
-                CubeTable currentTable = foundTables.Find(x => x._cubeTableName.Equals(node.FirstChild.InnerText));
+                CubeTable currentTable = foundTables.Find(x => x.CubeTableName.Equals(node.FirstChild.InnerText));
                 // Check if a new table is presented
                 if (currentTable is null)
                 {
                     // Add cube table
                     currentTable = new CubeTable();
-                    currentTable._cubeTableName = node.FirstChild.InnerText;
-                    checkNode = currentTable._cubeTableName;
+                    currentTable.CubeTableName = node.FirstChild.InnerText;
+                    checkNode = currentTable.CubeTableName;
 
                     // Add db ref table
                     
@@ -86,7 +96,7 @@ namespace Classes
                     string trueTableName, trueSchemaName;
                     trueTableName = trueTables.Item(0).Attributes.GetNamedItem("msprop:DbTableName").Value.ToString();
                     trueSchemaName = trueTables.Item(0).Attributes.GetNamedItem("msprop:DbSchemaName").Value.ToString();
-                    currentTable._tableName = trueSchemaName + "." + trueTableName;
+                    currentTable.TableName = trueSchemaName + "." + trueTableName;
                     
                     // Add table to output
                     foundTables.Add(currentTable);
@@ -98,7 +108,7 @@ namespace Classes
                 
                 // Find matching db column name
                 XmlNodeList trueColumns;
-                xPath = $"/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database/~ns~:DataSourceViews/~ns~:DataSourceView/~ns~:Schema/xs:schema/xs:element/xs:complexType/xs:choice/xs:element[@name=\'{currentTable._cubeTableName}\']/xs:complexType/xs:sequence/xs:element[@name=\'{node.LastChild.InnerText}\']";
+                xPath = $"/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database/~ns~:DataSourceViews/~ns~:DataSourceView/~ns~:Schema/xs:schema/xs:element/xs:complexType/xs:choice/xs:element[@name=\'{currentTable.CubeTableName}\']/xs:complexType/xs:sequence/xs:element[@name=\'{node.LastChild.InnerText}\']";
                 trueColumns = ArtifactReader.getArtifactNodes(xPath, myXmlCube);
                 string trueColumnName = trueColumns.Item(0).Attributes.GetNamedItem("msprop:DbColumnName").Value.ToString();
 
