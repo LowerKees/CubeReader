@@ -27,7 +27,7 @@ namespace Classes
             if(x == null || y == null)
                 return false;
 
-            if (x.columnName == y.columnName)
+            if (x.columnName.ToLower() == y.columnName.ToLower())
                 return true;
             else
                 return false;
