@@ -42,7 +42,8 @@ namespace CubeReader
                         Cube myCube = new Cube(cubeFile);
 
                         // Print tables and columns
-                        getCubeInfo(myCube);
+                        // Disabled getCubeInfo to reduce console output
+                        // getCubeInfo(myCube); 
 
                         // Add the cube to the compare list
                         compareCubeList.Add(myCube);
@@ -53,7 +54,7 @@ namespace CubeReader
                     throw;
                 }
 
-                // Unpack.dacpac files
+                // Unpack dacpac files
                 List<string> dacpacFileList = new List<string>();
                 dacpacFileList.AddRange(getFileList(dacpacPath, "*.dacpac"));
                 string unpackingPath = Environment.CurrentDirectory + "\\Unpacking";
@@ -61,7 +62,6 @@ namespace CubeReader
                 // Unpack the dacpac files
                 try
                 {
-
                     // Empty target location for each run
                     foreach (string dir in Directory.GetDirectories(unpackingPath))
                     {
@@ -69,7 +69,6 @@ namespace CubeReader
                         {
                             File.Delete(file);
                         }
-
                         Directory.Delete(dir);
                     }
 
@@ -96,6 +95,7 @@ namespace CubeReader
                             Database database = new Database(file);
 
                             // Print info to client
+                            // Disabled method to reduce console window output
                             // getDatabaseInfo(database);
 
                             compareDatabaseList.Add(database);
@@ -111,7 +111,10 @@ namespace CubeReader
                 List<Match> matches = new List<Match>();
                 try
                 {
-                    matches = Match.MatchCubeToDatabase(compareDatabaseList, compareCubeList);
+                    foreach(Cube cube in compareCubeList)
+                    {
+                        matches.Add(Match.MatchCubeToDatabase(compareDatabaseList, cube));
+                    }
                 }
                 catch (MatchException me)
                 {
@@ -127,13 +130,22 @@ namespace CubeReader
                 {
                     foreach (Match match in matches)
                     {
+                        IntroduceCubeChecks(match.MatchingCube._cubeName);
                         match.CheckForTables(match);
                         match.CheckForColumns(match);
                     }
                 }
+                catch (MatchException me)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine();
+                    Console.WriteLine($"ERROR: {me.Message}");
+                    Console.WriteLine("An error occured: execution aborted.");
+                    Console.ResetColor();
+                }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message); 
+                    Console.WriteLine(e.Message);
                 }
 
                 // TODO: remove debug statement
@@ -172,7 +184,7 @@ namespace CubeReader
                 Console.WriteLine("Column list:");
                 foreach (CubeColumn cubeColumn in cubeTable.ColumnList)
                 {
-                    Console.WriteLine($"Cube column: {cubeColumn._cubeColumnName} referencing db column {cubeColumn._ColumnName}");
+                    Console.WriteLine($"Cube column: {cubeColumn.CubeColumnName} referencing db column {cubeColumn.ColumnName}");
                 }
             }
         }
@@ -188,7 +200,7 @@ namespace CubeReader
                 Console.WriteLine("Column list:");
                 foreach (Column column in dbTable.ColumnList)
                 {
-                    Console.WriteLine($"Column: {column._ColumnName}");
+                    Console.WriteLine($"Column: {column.ColumnName}");
                 }
             }
         }
@@ -237,6 +249,12 @@ namespace CubeReader
             // Create async operation for unzip
             Console.WriteLine($"Unzipping {dacpacPath}...");
             ZipFile.ExtractToDirectory(dacpacPath, unpackingPath);
+        }
+
+        private static void IntroduceCubeChecks(string cubeName)
+        {
+            Console.WriteLine("\n*****************************************************");
+            Console.WriteLine($"***** Running checks for {cubeName}...\n");
         }
     }
 }
