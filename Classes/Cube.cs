@@ -68,7 +68,8 @@ namespace Classes
 
             // Determine xpath to search for tables
             XmlNodeList nodes;
-            string xDimPath = "/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database/~ns~:Dimensions/~ns~:Dimension";
+            string xDimPath = "/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database/" +
+                "~ns~:Dimensions/~ns~:Dimension";
             string xPath = "/~ns~:Attributes/~ns~:Attribute/~ns~:KeyColumns/~ns~:KeyColumn/~ns~:Source";
 
             nodes = ArtifactReader.getArtifactNodes(xPath, myXmlCube, xDimPath);
@@ -86,10 +87,12 @@ namespace Classes
                     checkNode = currentTable.CubeTableName;
 
                     // Add db ref table
-                    
+
                     // Find db table name and schema
                     XmlNodeList trueTables;
-                    xPath = $"/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database/~ns~:DataSourceViews/~ns~:DataSourceView/~ns~:Schema/xs:schema/xs:element/xs:complexType/xs:choice/xs:element[@name=\'{node.FirstChild.InnerText}\']";
+                    xPath = $"/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database/~ns~:DataSourceViews/" +
+                        $"~ns~:DataSourceView/~ns~:Schema/xs:schema/xs:element/xs:complexType/xs:choice/" +
+                        $"xs:element[@name=\'{node.FirstChild.InnerText}\']";
                     trueTables = ArtifactReader.getArtifactNodes(xPath, myXmlCube);
 
                     // Add findings to property list
@@ -97,22 +100,36 @@ namespace Classes
                     trueTableName = trueTables.Item(0).Attributes.GetNamedItem("msprop:DbTableName").Value.ToString();
                     trueSchemaName = trueTables.Item(0).Attributes.GetNamedItem("msprop:DbSchemaName").Value.ToString();
                     currentTable.TableName = trueSchemaName + "." + trueTableName;
-                    
+
                     // Add table to output
                     foundTables.Add(currentTable);
                 }
-                
-                // Add cube columns to table
-                CubeColumn myColumn = new CubeColumn();
-                myColumn._cubeColumnName = node.LastChild.InnerText;
-                
+
                 // Find matching db column name
                 XmlNodeList trueColumns;
-                xPath = $"/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database/~ns~:DataSourceViews/~ns~:DataSourceView/~ns~:Schema/xs:schema/xs:element/xs:complexType/xs:choice/xs:element[@name=\'{currentTable.CubeTableName}\']/xs:complexType/xs:sequence/xs:element[@name=\'{node.LastChild.InnerText}\']";
+                xPath = $"/~ns~:Batch/~ns~:Alter/~ns~:ObjectDefinition/~ns~:Database/~ns~:DataSourceViews/" +
+                    $"~ns~:DataSourceView/~ns~:Schema/xs:schema/xs:element/xs:complexType/xs:choice/" +
+                    $"xs:element[@name=\'{currentTable.CubeTableName}\']/xs:complexType/xs:sequence/" +
+                    $"xs:element[@name=\'{node.LastChild.InnerText}\']";
                 trueColumns = ArtifactReader.getArtifactNodes(xPath, myXmlCube);
-                string trueColumnName = trueColumns.Item(0).Attributes.GetNamedItem("msprop:DbColumnName").Value.ToString();
 
-                myColumn._ColumnName = trueColumnName;
+                // Do not include logical columns. These columns
+                // are computed in the data source view and do not
+                // directly correspond to database column. 
+                // Add them to a special logical column list for
+                // later use.
+                if (HandleLogicalColumns(trueColumns, currentTable))
+                {
+                    break;
+                }
+
+                // Add cube columns to table
+                CubeColumn myColumn = new CubeColumn()
+                {
+                    ColumnName = trueColumns.Item(0).Attributes.GetNamedItem("msprop:DbColumnName").Value.ToString(),
+                    CubeColumnName = node.LastChild.InnerText
+                };
+                    
                 currentTable.AddColumn(myColumn);
             }
             return foundTables;
@@ -201,6 +218,26 @@ namespace Classes
             XmlDocument myXmlCube = new XmlDocument();
             myXmlCube.Load(cubePath);
             return myXmlCube;
+        }
+
+        private static Boolean HandleLogicalColumns(XmlNodeList trueColumns, CubeTable currentTable)
+        {
+            if (trueColumns.Item(0).Attributes["msprop:IsLogical"] != null)
+            {
+                if (trueColumns.Item(0).Attributes.GetNamedItem("msprop:IsLogical").Value.ToString() == "True")
+                {
+                    CubeColumn myLogicalColumn = new CubeColumn
+                    {
+                        CubeColumnName =
+                        trueColumns.Item(0).Attributes.GetNamedItem("msprop:DbColumnName").Value.ToString()
+                    };
+                    currentTable.LogicalColumns.Add(myLogicalColumn);
+                    // Return true to indicate the column is logical
+                    return true;
+                }
+            }
+            // Return false to indicate the column is not logical
+            return false;
         }
     }
 }
