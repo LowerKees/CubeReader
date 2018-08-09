@@ -66,7 +66,7 @@ namespace Classes
                 {
                     Column column = new Column();
 
-                    column._ColumnName = simplifyColumnName(c.InnerText.Replace("[", "").Replace("]", ""));
+                    column.ColumnName = simplifyColumnName(c.InnerText.Replace("[", "").Replace("]", ""));
                     table.AddColumn(column);
                     Console.WriteLine($"Found column {c.InnerText} and added it to the {tableOrView}.");
                 }

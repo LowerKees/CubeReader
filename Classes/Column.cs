@@ -8,17 +8,17 @@ namespace Classes
 {
     public class Column : IEqualityComparer<Column>
     {
-        private string columnName;
+        private string _columnName;
 
         public Column(string columnName = null, string dataType = null, int Precision = 0, int Scale = 0)
         {
-            this.columnName = columnName;
+            this._columnName = columnName;
         }
 
-        public string _ColumnName
+        public string ColumnName
         {
-            get { return columnName; }
-            set { columnName = value; }
+            get { return _columnName; }
+            set { _columnName = value; }
         }
 
         // Implementation of IEqualityComparer interface
@@ -27,7 +27,7 @@ namespace Classes
             if(x == null || y == null)
                 return false;
 
-            if (x.columnName.ToLower() == y.columnName.ToLower())
+            if (x._columnName.ToLower() == y._columnName.ToLower())
                 return true;
             else
                 return false;
@@ -35,7 +35,7 @@ namespace Classes
 
         int IEqualityComparer<Column>.GetHashCode(Column obj)
         {
-            return obj.columnName.ToLower().GetHashCode();
+            return obj._columnName.ToLower().GetHashCode();
         }
     }
 }
