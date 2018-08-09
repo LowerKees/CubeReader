@@ -14,9 +14,20 @@ namespace Classes
         private int _numericScale;
         private int _stringLength;
 
-        public Column(string columnName = null, string dataType = null, int Precision = 0, int Scale = 0)
+        // Simple constructor
+        public Column()
+        {
+        }
+
+        // Constructor to fill data types 
+        public Column(string columnName = null, string dataType = null, 
+            int numericPrecision = 0, int numericScale = 0, int stringLength = 0)
         {
             this._columnName = columnName;
+            this._dataType = dataType;
+            this._numericPrecision = numericPrecision;
+            this._numericScale = numericScale;
+            this._stringLength = stringLength;
         }
 
         public string ColumnName
