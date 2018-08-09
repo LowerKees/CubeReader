@@ -31,6 +31,7 @@ namespace Classes
 
         public DataSource _databaseDs { get { return databaseDs; } }
         public List<Table> _databaseTables { get { return databaseTables; } }
+        public List<Table> _databaseViews { get { return databaseViews; } }
 
         private List<Table> getDbTables(string modelPath, string tableOrView)
         {
@@ -48,8 +49,8 @@ namespace Classes
             foreach(XmlNode x in nodes)
             {
                 Table table = new Table();
-                table._tableName = x.InnerText;
-                table._tableType = tableOrView == "table" ? "table" : "view";
+                table.TableName = x.InnerText.Replace("[","").Replace("]","");
+                table.TableType = tableOrView == "table" ? "table" : "view";
 
                 tables.Add(table);
                 Console.WriteLine($"Found table {x.InnerText}");
@@ -64,7 +65,8 @@ namespace Classes
                 foreach(XmlNode c in columns)
                 {
                     Column column = new Column();
-                    column._ColumnName = c.InnerText;
+
+                    column.ColumnName = simplifyColumnName(c.InnerText.Replace("[", "").Replace("]", ""));
                     table.AddColumn(column);
                     Console.WriteLine($"Found column {c.InnerText} and added it to the {tableOrView}.");
                 }
@@ -94,6 +96,16 @@ namespace Classes
             }
 
             return dataSource;
+        }
+
+        private static string simplifyColumnName(string complexName)
+        {
+            string[] nameComponents = null;
+
+            nameComponents = complexName.Split(".".ToCharArray());
+
+            string simpleName = nameComponents.Last().Replace("[","").Replace("]","");
+            return simpleName;
         }
     }
 }

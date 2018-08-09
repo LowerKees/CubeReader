@@ -8,14 +8,29 @@ namespace Classes
 {
     public class CubeTable : Table
     {
-        public string _cubeTableName
+        public CubeTable() : base()
+        {
+            _logicalColumns = new List<CubeColumn>();
+        }
+
+        private List<CubeColumn> _logicalColumns;
+
+        public string CubeTableName
         {
             get;
             set;
         }
 
-        public CubeTable() : base()
+        public List<CubeColumn> LogicalColumns
         {
+            get
+            {
+                return _logicalColumns;
+            }
+            set
+            {
+                _logicalColumns = value;
+            }
         }
     }
 }

@@ -42,7 +42,8 @@ namespace CubeReader
                         Cube myCube = new Cube(cubeFile);
 
                         // Print tables and columns
-                        getCubeInfo(myCube);
+                        // Disabled getCubeInfo to reduce console output
+                        // getCubeInfo(myCube); 
 
                         // Add the cube to the compare list
                         compareCubeList.Add(myCube);
@@ -50,10 +51,10 @@ namespace CubeReader
                 }
                 catch (Exception e) 
                 {
-                    Console.WriteLine($"An error occured while reading the cube: {e.Message}");
+                    throw;
                 }
 
-                // Unpack.dacpac files
+                // Unpack dacpac files
                 List<string> dacpacFileList = new List<string>();
                 dacpacFileList.AddRange(getFileList(dacpacPath, "*.dacpac"));
                 string unpackingPath = Environment.CurrentDirectory + "\\Unpacking";
@@ -61,7 +62,6 @@ namespace CubeReader
                 // Unpack the dacpac files
                 try
                 {
-
                     // Empty target location for each run
                     foreach (string dir in Directory.GetDirectories(unpackingPath))
                     {
@@ -69,7 +69,6 @@ namespace CubeReader
                         {
                             File.Delete(file);
                         }
-
                         Directory.Delete(dir);
                     }
 
@@ -81,7 +80,7 @@ namespace CubeReader
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"An error occured while unpacking dacpac files: {e.Message}");
+                    throw;
                 }
 
                 // Read the model.xml file from the dacpac into memory
@@ -96,6 +95,7 @@ namespace CubeReader
                             Database database = new Database(file);
 
                             // Print info to client
+                            // Disabled method to reduce console window output
                             // getDatabaseInfo(database);
 
                             compareDatabaseList.Add(database);
@@ -104,21 +104,49 @@ namespace CubeReader
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"An error occured while reading dacpac model.xml files: {e.Message}");
+                    throw;
                 }
 
                 // Match cubes and databases in list of matches
+                List<Match> matches = new List<Match>();
                 try
                 {
-                    List<Matching> matches = new List<Matching>();
-                    matches = Matching.matchCubeToDatabase(compareDatabaseList, compareCubeList);
+                    foreach(Cube cube in compareCubeList)
+                    {
+                        matches.Add(Match.MatchCubeToDatabase(compareDatabaseList, cube));
+                    }
+                }
+                catch (MatchException me)
+                {
+                    Console.WriteLine(me.Message); 
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"An error occured while matching databases and cubes: {e.Message}");
-                }
+                    throw;
+                }          
 
                 // Run matching checks
+                try
+                {
+                    foreach (Match match in matches)
+                    {
+                        IntroduceCubeChecks(match.MatchingCube._cubeName);
+                        match.CheckForTables(match);
+                        match.CheckForColumns(match);
+                    }
+                }
+                catch (MatchException me)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine();
+                    Console.WriteLine($"ERROR: {me.Message}");
+                    Console.WriteLine("An error occured: execution aborted.");
+                    Console.ResetColor();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
 
                 // TODO: remove debug statement
                 Console.ReadKey();
@@ -152,11 +180,11 @@ namespace CubeReader
 
             foreach (CubeTable cubeTable in myCube._cubeTables)
             {
-                Console.WriteLine($"Found the table {cubeTable._cubeTableName} referencing {cubeTable._tableName}");
+                Console.WriteLine($"Found the table {cubeTable.CubeTableName} referencing {cubeTable.TableName}");
                 Console.WriteLine("Column list:");
-                foreach (CubeColumn cubeColumn in cubeTable.columnList)
+                foreach (CubeColumn cubeColumn in cubeTable.ColumnList)
                 {
-                    Console.WriteLine($"Cube column: {cubeColumn._cubeColumnName} referencing db column {cubeColumn._ColumnName}");
+                    Console.WriteLine($"Cube column: {cubeColumn.CubeColumnName} referencing db column {cubeColumn.ColumnName}");
                 }
             }
         }
@@ -168,11 +196,11 @@ namespace CubeReader
             Console.WriteLine($"Found the initial catalog {myDatabase._databaseDs._dsInitCatalog}");
             foreach (Table dbTable in myDatabase._databaseTables)
             {
-                Console.WriteLine($"Found the {dbTable._tableType} {dbTable._tableName}");
+                Console.WriteLine($"Found the {dbTable.TableType} {dbTable.TableName}");
                 Console.WriteLine("Column list:");
-                foreach (Column column in dbTable.columnList)
+                foreach (Column column in dbTable.ColumnList)
                 {
-                    Console.WriteLine($"Column: {column._ColumnName}");
+                    Console.WriteLine($"Column: {column.ColumnName}");
                 }
             }
         }
@@ -221,6 +249,12 @@ namespace CubeReader
             // Create async operation for unzip
             Console.WriteLine($"Unzipping {dacpacPath}...");
             ZipFile.ExtractToDirectory(dacpacPath, unpackingPath);
+        }
+
+        private static void IntroduceCubeChecks(string cubeName)
+        {
+            Console.WriteLine("\n*****************************************************");
+            Console.WriteLine($"***** Running checks for {cubeName}...\n");
         }
     }
 }

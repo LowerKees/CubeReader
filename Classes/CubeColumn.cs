@@ -8,23 +8,28 @@ namespace Classes
 {
     public class CubeColumn : Column
     {
-        private string cubeColumnName, dataType;
-        private int dataTypePrec, dataTypeScale;
+        private string _cubeColumnName;
 
-        public string _cubeColumnName
+        public string CubeColumnName
         {
             get
             {
-                return cubeColumnName;
+                return _cubeColumnName;
             }
             set
             {
-                cubeColumnName = value;
+                _cubeColumnName = value;
             }
         }
 
         public CubeColumn() : base()
         {
+        }
+
+        public CubeColumn(string columnName, string cubeColumnName) : base()
+        {
+            this.ColumnName = columnName;
+            this._cubeColumnName = CubeColumnName;
         }
     }
 }
