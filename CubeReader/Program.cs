@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Classes;
 
 namespace CubeReader
@@ -146,6 +143,23 @@ namespace CubeReader
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
+                }
+
+                // Run additional info statements
+                try
+                {
+                    Console.WriteLine("\n*******************************************");
+                    Console.WriteLine("***** Running additional info statements\n");
+
+                    foreach (Cube cube in compareCubeList)
+                    {
+                        Information.OutputLogicalColumns(cube);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
                 }
 
                 // TODO: remove debug statement

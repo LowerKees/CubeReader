@@ -48,6 +48,7 @@
     <Compile Include="CubeTable.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="DataSource.cs" />
+    <Compile Include="Information.cs" />
     <Compile Include="MatchException.cs" />
     <Compile Include="Matching.cs" />
     <Compile Include="Table.cs" />
