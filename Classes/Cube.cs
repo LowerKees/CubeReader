@@ -125,9 +125,8 @@ namespace Classes
                     break;
                 }
 
-                // Get column data type
-                Tuple<string, string> dataType;
-                dataType = Column.GetCubeColumnDataType(trueColumns);
+                // Get column data type from the cube
+                Tuple<string, string> dataType = Column.GetCubeColumnDataType(trueColumns);
 
                 // Add cube columns to table
                 CubeColumn myColumn = new CubeColumn()

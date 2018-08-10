@@ -9,12 +9,6 @@ namespace Classes
 {
     public class Column : IEqualityComparer<Column>
     {
-        private string _columnName;
-        private string _dataType;
-        private int _numericPrecision;
-        private int _numericScale;
-        private int _stringLength;
-
         // Simple constructor
         public Column()
         {
@@ -24,37 +18,18 @@ namespace Classes
         public Column(string columnName = null, string dataType = null, 
             int numericPrecision = 0, int numericScale = 0, int stringLength = 0)
         {
-            this._columnName = columnName;
-            this._dataType = dataType;
-            this._numericPrecision = numericPrecision;
-            this._numericScale = numericScale;
-            this._stringLength = stringLength;
+            this.ColumnName = columnName;
+            this.DataType = dataType;
+            this.NumericPrecision = numericPrecision;
+            this.NumericScale = numericScale;
+            this.StringLength = stringLength;
         }
 
-        public string ColumnName
-        {
-            get { return _columnName; }
-            set { _columnName = value; }
-        }
-        
-        public string DataType
-        {
-            get
-            {
-                return _dataType;
-            }
-            set
-            {
-                if (value is string)
-                {
-                    _dataType = value;
-                }
-                else
-                {
-                    Console.WriteLine("Value provided is not a string.");
-                }
-            }
-        }
+        public string ColumnName { get; set; }
+        public string DataType { get; set; }
+        public int NumericPrecision { get; set; }
+        public int NumericScale { get; set; }
+        public int StringLength { get; set; }
 
         // Implementation of IEqualityComparer interface
         bool IEqualityComparer<Column>.Equals(Column x, Column y)
@@ -62,7 +37,7 @@ namespace Classes
             if(x == null || y == null)
                 return false;
 
-            if (x._columnName.ToLower() == y._columnName.ToLower())
+            if (x.ColumnName.ToLower() == y.ColumnName.ToLower())
                 return true;
             else
                 return false;
@@ -70,35 +45,34 @@ namespace Classes
 
         int IEqualityComparer<Column>.GetHashCode(Column obj)
         {
-            return obj._columnName.ToLower().GetHashCode();
+            return obj.ColumnName.ToLower().GetHashCode();
         }
 
         // Get the data type from the cube
         public static Tuple<string, string> GetCubeColumnDataType(XmlNodeList nodes)
         {
-            Tuple<string, string> tuple;
+            Tuple<string, string> tuple = null;
             string dataType = null;
-            string length = null;
+            string length = "not applicable";
+            
+            // datatype selection is always based on the first node in the NodeList
 
-            foreach (XmlNode node in nodes)
+            // datatypes int, decimal, double, dateTime and boolean are 
+            // stored in the "type" attribute
+            if (nodes.Item(0).Attributes[$"type"] != null)
             {
-                // datatypes int, decimal, double, dateTime and boolean are 
-                // stored in the "type" attribute
-                if (node.Attributes["type"] != null)
-                {
-                    dataType = node.Attributes.GetNamedItem("type").Value.ToString().Replace("xs:","");
-                }
-                // string datatype and character length are stored
-                // in the child nodes
-                else if (node.HasChildNodes)
-                {
-                    dataType = FindXmlAttribute(node.ChildNodes, "base");
-                    length = FindXmlAttribute(node.ChildNodes, "value");
-                }
+                dataType = FindXmlAttribute(nodes, "type");
+            }
+            // string datatype and character length are stored
+            // in the child nodes
+            else if (nodes.Item(0).HasChildNodes)
+            {
+                dataType = FindXmlAttribute(nodes.Item(0).ChildNodes, "base");
+                length = FindXmlAttribute(nodes.Item(0).ChildNodes, "value");
             }
 
             // TODO: default values aanpassen van "" en 0 naar iets zinnigs.
-            tuple = Tuple.Create(dataType, length);
+            tuple = Tuple.Create(dataType.Replace("xs:",""), length.Replace("xs:",""));
             return tuple;
         }
 
@@ -106,7 +80,7 @@ namespace Classes
         private static string FindXmlAttribute(XmlNodeList xmlNodeList, string attributeName)
         {
             string attributeFound = null;
-            foreach(XmlNode xmlNode in xmlNodeList)
+            foreach (XmlNode xmlNode in xmlNodeList)
             {
                 if (xmlNode.Attributes[$"{attributeName}"] != null)
                 {
@@ -117,7 +91,7 @@ namespace Classes
                     if(xmlNode.HasChildNodes)
                     {
                         XmlNodeList myNodes = xmlNode.ChildNodes;
-                        FindXmlAttribute(myNodes, attributeName);
+                        attributeFound = FindXmlAttribute(myNodes, attributeName);
                     }
                 }
             }
