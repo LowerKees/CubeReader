@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Classes
 {
@@ -70,6 +71,57 @@ namespace Classes
         int IEqualityComparer<Column>.GetHashCode(Column obj)
         {
             return obj._columnName.ToLower().GetHashCode();
+        }
+
+        // Get the data type from the cube
+        public static Tuple<string, string> GetCubeColumnDataType(XmlNodeList nodes)
+        {
+            Tuple<string, string> tuple;
+            string dataType = null;
+            string length = null;
+
+            foreach (XmlNode node in nodes)
+            {
+                // datatypes int, decimal, double, dateTime and boolean are 
+                // stored in the "type" attribute
+                if (node.Attributes["type"] != null)
+                {
+                    dataType = node.Attributes.GetNamedItem("type").Value.ToString().Replace("xs:","");
+                }
+                // string datatype and character length are stored
+                // in the child nodes
+                else if (node.HasChildNodes)
+                {
+                    dataType = FindXmlAttribute(node.ChildNodes, "base");
+                    length = FindXmlAttribute(node.ChildNodes, "value");
+                }
+            }
+
+            // TODO: default values aanpassen van "" en 0 naar iets zinnigs.
+            tuple = Tuple.Create(dataType, length);
+            return tuple;
+        }
+
+        // Recursive node reader
+        private static string FindXmlAttribute(XmlNodeList xmlNodeList, string attributeName)
+        {
+            string attributeFound = null;
+            foreach(XmlNode xmlNode in xmlNodeList)
+            {
+                if (xmlNode.Attributes[$"{attributeName}"] != null)
+                {
+                    attributeFound = xmlNode.Attributes.GetNamedItem($"{attributeName}").Value.ToString();
+                }
+                else
+                {
+                    if(xmlNode.HasChildNodes)
+                    {
+                        XmlNodeList myNodes = xmlNode.ChildNodes;
+                        FindXmlAttribute(myNodes, attributeName);
+                    }
+                }
+            }
+            return attributeFound;
         }
     }
 }

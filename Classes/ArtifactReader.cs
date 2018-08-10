@@ -7,10 +7,8 @@ using System.Xml;
 
 namespace Classes
 {
-    class ArtifactReader
+    static class ArtifactReader
     {
-        public ArtifactReader(){}
-
         public static XmlNodeList getArtifactNodes(string xPath, XmlDocument xml, string baseXPath = null)
         {
             // Determine xpath to search for dsv

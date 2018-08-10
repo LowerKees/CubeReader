@@ -64,7 +64,6 @@ namespace Classes
             // Create, configure and load xml items and values
             XmlDocument myXmlCube = new XmlDocument();
             myXmlCube = loadCube(cubePath);
-            XmlNode root = myXmlCube.DocumentElement;
 
             // Determine xpath to search for tables
             XmlNodeList nodes;
@@ -72,6 +71,7 @@ namespace Classes
                 "~ns~:Dimensions/~ns~:Dimension";
             string xPath = "/~ns~:Attributes/~ns~:Attribute/~ns~:KeyColumns/~ns~:KeyColumn/~ns~:Source";
 
+            // Read the cube's nodes based on the xPath expression
             nodes = ArtifactReader.getArtifactNodes(xPath, myXmlCube, xDimPath);
 
             string checkNode = null;
@@ -99,6 +99,8 @@ namespace Classes
                     string trueTableName, trueSchemaName;
                     trueTableName = trueTables.Item(0).Attributes.GetNamedItem("msprop:DbTableName").Value.ToString();
                     trueSchemaName = trueTables.Item(0).Attributes.GetNamedItem("msprop:DbSchemaName").Value.ToString();
+                    
+                    // Concat the schema and table name and store it as table name
                     currentTable.TableName = trueSchemaName + "." + trueTableName;
 
                     // Add table to output
@@ -123,11 +125,17 @@ namespace Classes
                     break;
                 }
 
+                // Get column data type
+                Tuple<string, string> dataType;
+                dataType = Column.GetCubeColumnDataType(trueColumns);
+
                 // Add cube columns to table
                 CubeColumn myColumn = new CubeColumn()
                 {
                     ColumnName = trueColumns.Item(0).Attributes.GetNamedItem("msprop:DbColumnName").Value.ToString(),
-                    CubeColumnName = node.LastChild.InnerText
+                    CubeColumnName = node.LastChild.InnerText,
+                    CubeColumnDataType = dataType.Item1,
+                    CubeColumnDataLength = dataType.Item2                    
                 };
                     
                 currentTable.AddColumn(myColumn);
@@ -169,7 +177,6 @@ namespace Classes
             // Create, configure and load xml items and values
             XmlDocument myXmlCube = new XmlDocument();
             myXmlCube = loadCube(cubePath);
-            XmlNode root = myXmlCube.DocumentElement;
 
             // Determine xpath to search for cube name
             XmlNodeList nameNodes;
