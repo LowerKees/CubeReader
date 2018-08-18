@@ -120,13 +120,13 @@ namespace Classes
                 // directly correspond to database column. 
                 // Add them to a special logical column list for
                 // later use.
-                if (HandleLogicalColumns(trueColumns, currentTable))
-                {
+                if (CubeColumn.HandleLogicalColumns(trueColumns, currentTable))
                     break;
-                }
 
-                // Get column data type from the cube
-                Tuple<string, string> dataType = Column.GetCubeColumnDataType(trueColumns);
+                // Get cube column data type from the cube
+                Tuple<string, string> dataType = CubeColumn.GetCubeColumnDataType(trueColumns);
+
+                // TODO: Get database column data type from the dacpac
 
                 // Add cube columns to table
                 CubeColumn myColumn = new CubeColumn()
@@ -224,26 +224,6 @@ namespace Classes
             XmlDocument myXmlCube = new XmlDocument();
             myXmlCube.Load(cubePath);
             return myXmlCube;
-        }
-
-        private static Boolean HandleLogicalColumns(XmlNodeList trueColumns, CubeTable currentTable)
-        {
-            if (trueColumns.Item(0).Attributes["msprop:IsLogical"] != null)
-            {
-                if (trueColumns.Item(0).Attributes.GetNamedItem("msprop:IsLogical").Value.ToString() == "True")
-                {
-                    CubeColumn myLogicalColumn = new CubeColumn
-                    {
-                        CubeColumnName =
-                        trueColumns.Item(0).Attributes.GetNamedItem("msprop:DbColumnName").Value.ToString()
-                    };
-                    currentTable.LogicalColumns.Add(myLogicalColumn);
-                    // Return true to indicate the column is logical
-                    return true;
-                }
-            }
-            // Return false to indicate the column is not logical
-            return false;
         }
     }
 }

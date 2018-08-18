@@ -47,55 +47,5 @@ namespace Classes
         {
             return obj.ColumnName.ToLower().GetHashCode();
         }
-
-        // Get the data type from the cube
-        public static Tuple<string, string> GetCubeColumnDataType(XmlNodeList nodes)
-        {
-            Tuple<string, string> tuple = null;
-            string dataType = null;
-            string length = "not applicable";
-            
-            // datatype selection is always based on the first node in the NodeList
-
-            // datatypes int, decimal, double, dateTime and boolean are 
-            // stored in the "type" attribute
-            if (nodes.Item(0).Attributes[$"type"] != null)
-            {
-                dataType = FindXmlAttribute(nodes, "type");
-            }
-            // string datatype and character length are stored
-            // in the child nodes
-            else if (nodes.Item(0).HasChildNodes)
-            {
-                dataType = FindXmlAttribute(nodes.Item(0).ChildNodes, "base");
-                length = FindXmlAttribute(nodes.Item(0).ChildNodes, "value");
-            }
-
-            // TODO: default values aanpassen van "" en 0 naar iets zinnigs.
-            tuple = Tuple.Create(dataType.Replace("xs:",""), length.Replace("xs:",""));
-            return tuple;
-        }
-
-        // Recursive node reader
-        private static string FindXmlAttribute(XmlNodeList xmlNodeList, string attributeName)
-        {
-            string attributeFound = null;
-            foreach (XmlNode xmlNode in xmlNodeList)
-            {
-                if (xmlNode.Attributes[$"{attributeName}"] != null)
-                {
-                    attributeFound = xmlNode.Attributes.GetNamedItem($"{attributeName}").Value.ToString();
-                }
-                else
-                {
-                    if(xmlNode.HasChildNodes)
-                    {
-                        XmlNodeList myNodes = xmlNode.ChildNodes;
-                        attributeFound = FindXmlAttribute(myNodes, attributeName);
-                    }
-                }
-            }
-            return attributeFound;
-        }
     }
 }

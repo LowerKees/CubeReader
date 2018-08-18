@@ -51,5 +51,27 @@ namespace Classes
 
             return nodes;
         }
+
+        // Recursive node reader
+        public static string FindXmlAttribute(XmlNodeList xmlNodeList, string attributeName)
+        {
+            string attributeFound = null;
+            foreach (XmlNode xmlNode in xmlNodeList)
+            {
+                if (xmlNode.Attributes[$"{attributeName}"] != null)
+                {
+                    attributeFound = xmlNode.Attributes.GetNamedItem($"{attributeName}").Value.ToString();
+                }
+                else
+                {
+                    if (xmlNode.HasChildNodes)
+                    {
+                        XmlNodeList myNodes = xmlNode.ChildNodes;
+                        attributeFound = FindXmlAttribute(myNodes, attributeName);
+                    }
+                }
+            }
+            return attributeFound;
+        }
     }
 }
