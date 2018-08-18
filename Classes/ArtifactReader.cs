@@ -7,10 +7,8 @@ using System.Xml;
 
 namespace Classes
 {
-    class ArtifactReader
+    static class ArtifactReader
     {
-        public ArtifactReader(){}
-
         public static XmlNodeList getArtifactNodes(string xPath, XmlDocument xml, string baseXPath = null)
         {
             // Determine xpath to search for dsv
@@ -52,6 +50,28 @@ namespace Classes
             }
 
             return nodes;
+        }
+
+        // Recursive node reader
+        public static string FindXmlAttribute(XmlNodeList xmlNodeList, string attributeName)
+        {
+            string attributeFound = null;
+            foreach (XmlNode xmlNode in xmlNodeList)
+            {
+                if (xmlNode.Attributes[$"{attributeName}"] != null)
+                {
+                    attributeFound = xmlNode.Attributes.GetNamedItem($"{attributeName}").Value.ToString();
+                }
+                else
+                {
+                    if (xmlNode.HasChildNodes)
+                    {
+                        XmlNodeList myNodes = xmlNode.ChildNodes;
+                        attributeFound = FindXmlAttribute(myNodes, attributeName);
+                    }
+                }
+            }
+            return attributeFound;
         }
     }
 }

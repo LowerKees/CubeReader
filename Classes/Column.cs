@@ -3,23 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace Classes
 {
     public class Column : IEqualityComparer<Column>
     {
-        private string _columnName;
-
-        public Column(string columnName = null, string dataType = null, int Precision = 0, int Scale = 0)
+        // Simple constructor
+        public Column()
         {
-            this._columnName = columnName;
         }
 
-        public string ColumnName
+        // Constructor to fill data types 
+        public Column(string columnName = null, string dataType = null, 
+            int numericPrecision = 0, int numericScale = 0, int stringLength = 0)
         {
-            get { return _columnName; }
-            set { _columnName = value; }
+            this.ColumnName = columnName;
+            this.DataType = dataType;
+            this.NumericPrecision = numericPrecision;
+            this.NumericScale = numericScale;
+            this.StringLength = stringLength;
         }
+
+        public string ColumnName { get; set; }
+        public string DataType { get; set; }
+        public int NumericPrecision { get; set; }
+        public int NumericScale { get; set; }
+        public int StringLength { get; set; }
 
         // Implementation of IEqualityComparer interface
         bool IEqualityComparer<Column>.Equals(Column x, Column y)
@@ -27,7 +37,7 @@ namespace Classes
             if(x == null || y == null)
                 return false;
 
-            if (x._columnName.ToLower() == y._columnName.ToLower())
+            if (x.ColumnName.ToLower() == y.ColumnName.ToLower())
                 return true;
             else
                 return false;
@@ -35,7 +45,7 @@ namespace Classes
 
         int IEqualityComparer<Column>.GetHashCode(Column obj)
         {
-            return obj._columnName.ToLower().GetHashCode();
+            return obj.ColumnName.ToLower().GetHashCode();
         }
     }
 }
