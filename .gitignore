@@ -8,3 +8,10 @@
 *.exe
 Bin/
 Obj/
+
+## ignore user cache files and locks
+*.lock
+*.ide
+*.ide-shm
+*.ide-wal
+*.suo
