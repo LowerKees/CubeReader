@@ -93,6 +93,7 @@ namespace Classes
 
             Tuple<CubeTable, Table> tableTuple = null;
             Tuple<CubeTable, Table> viewTuple = null;
+
             foreach (Database database in databases)
             {
                 // Find all corresponding tables based
