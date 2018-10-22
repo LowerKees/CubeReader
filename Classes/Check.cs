@@ -6,127 +6,9 @@ using System.Threading.Tasks;
 
 namespace Classes
 {
-    public class Match
+    public class Check
     {
-        
-        public Match()
-        {
-            MatchingCube = null;
-            MatchedDatabases = new List<Database>();
-        }
-
-        public Match(Cube matchingCube)
-        {
-            MatchingCube = matchingCube;
-            MatchedDatabases = new List<Database>();
-        }
-            
-        private Cube _matchingCube;
-        public Cube MatchingCube
-        {
-            get
-            {
-                return _matchingCube;
-            }
-            set
-            {
-                _matchingCube = value;
-            }
-        }
-
-        private List<Database> _matchedDatabases;
-        public List<Database> MatchedDatabases
-        {
-            get
-            {
-                return _matchedDatabases;
-            }
-            set
-            {
-                _matchedDatabases = value;
-            }
-        }
-
-        public static Match MatchCubeToDatabase(List<Database> databases, Cube cube)
-        {
-            //
-            // Summary:
-            //      Based on the connection strings and their initial
-            //      catalog values found in the cube, the corresponding 
-            //      databases are matched and returned to the caller.
-            //
-
-            Match match = new Match(cube);
-            Console.WriteLine($"Comparing for cube {cube._cubeName}...");
-
-            foreach (DataSource ds in cube._cubeDs)
-            {
-                Database db = new Database();
-                // Compare based on Initial Catalog because
-                // databases have no connection string
-
-                db = databases.Find(x =>
-                    x._databaseDs._dsInitCatalog.Equals(ds._dsInitCatalog));
-
-                if (db == null)
-                {
-                    MatchException matchException = new MatchException($"The cube " +
-                        $"{cube._cubeName} has no corresponding databases.");
-                    throw matchException;
-                }
-
-                Console.WriteLine($"The cube {cube._cubeName} connects to database " +
-                    $"{db._databaseDs._dsInitCatalog}");
-                match.MatchedDatabases.Add(db);
-            }
-            return match;
-        }
-
-        private static Tuple<CubeTable, Table> MatchTables(CubeTable cubeTable, 
-            List<Database> databases)
-        {
-            //
-            // Summary:
-            //      Returns matched cube and database
-            //      tables or view for futher analysis.
-
-            Tuple<CubeTable, Table> tableTuple = null;
-            Tuple<CubeTable, Table> viewTuple = null;
-            foreach (Database database in databases)
-            {
-                // Find all corresponding tables based
-                // on the table name and schema name 
-                // of both ref types
-                foreach (Table table in database._databaseTables)
-                {
-                    if (table.Equals(cubeTable))
-                    {
-                        tableTuple = Tuple.Create(cubeTable, table);
-                    }
-                }
-
-                // Find all corresponding views based
-                // on the table name and schema name of 
-                // both ref types
-                foreach (Table table in database._databaseViews)
-                {
-                    if (table.Equals(cubeTable))
-                    {
-                        viewTuple = Tuple.Create(cubeTable, table);
-                    }
-                }
-            }
-            // Database name spaces do not allow
-            // tables or views with identical names within a 
-            // single database. So no check is installed.
-            if(tableTuple != null)
-            {
-                return tableTuple;
-            }
-            return viewTuple;
-        }
-
-        public void CheckForTables(Match match)
+        public static void CheckForTables(Match match)
         {
             //
             // Summary: 
@@ -144,7 +26,7 @@ namespace Classes
 
             foreach (CubeTable cubeTable in match.MatchingCube._cubeTables)
             {
-                foreach(Database db in match.MatchedDatabases)
+                foreach (Database db in match.MatchedDatabases)
                 {
                     // See if the cubeTable is found in the database table list
                     Boolean isTable = db._databaseTables.Any(x => x.TableName.ToLower() == cubeTable.TableName.ToLower());
@@ -182,7 +64,7 @@ namespace Classes
             }
         }
 
-        public void CheckForColumns(Match match)
+        public static void CheckForColumns(Match match)
         {
             // Summary: 
             //      checks if every column in the
@@ -199,27 +81,27 @@ namespace Classes
                 $"have corresponding database columns.");
             List<CubeTable> nonPresentColumnTables = new List<CubeTable>();
 
-            foreach(CubeTable cubeTable in match.MatchingCube._cubeTables)
+            foreach (CubeTable cubeTable in match.MatchingCube._cubeTables)
             {
                 // Match the cube table to the database table
-                Tuple<CubeTable, Table> tuple = MatchTables(cubeTable, match.MatchedDatabases);
+                Tuple<CubeTable, Table> tuple = Match.MatchTables(cubeTable, match.MatchedDatabases);
 
                 // Create a list to accomodate all unfound
                 // columns.
                 List<Column> unfoundColumns = new List<Column>();
 
-                foreach(CubeColumn cubeColumn in tuple.Item1.ColumnList)
+                foreach (CubeColumn cubeColumn in tuple.Item1.ColumnList)
                 {
                     // Search for the cube column in 
                     // every matched database's table
                     // column list.
-                    Boolean isFound = 
+                    Boolean isFound =
                         tuple.Item2.ColumnList.Any(
                             x => x.ColumnName.ToLower() == cubeColumn.ColumnName.ToLower());
 
                     // If the cube column is not found
                     // add it to the unfound list.
-                    if(!isFound)
+                    if (!isFound)
                     {
                         unfoundColumns.Add(cubeColumn);
                     }
@@ -227,7 +109,7 @@ namespace Classes
 
                 // Collect all the columns that cannot be
                 // matched with a database column
-                if(unfoundColumns.Count > 0)
+                if (unfoundColumns.Count > 0)
                 {
                     CubeTable tableWithMissingColumns = new CubeTable();
                     tableWithMissingColumns.TableName = cubeTable.TableName;
@@ -240,9 +122,9 @@ namespace Classes
             // First; do the non statisfied conditions
             if (nonPresentColumnTables.Count > 0)
             {
-                foreach(CubeTable cubeTable in nonPresentColumnTables)
+                foreach (CubeTable cubeTable in nonPresentColumnTables)
                 {
-                    foreach(CubeColumn cubeColumn in cubeTable.ColumnList)
+                    foreach (CubeColumn cubeColumn in cubeTable.ColumnList)
                     {
                         string message = $"The cube column {cubeColumn.CubeColumnName}" +
                             $" from cube table {cubeTable.TableName} cannot be found in" +

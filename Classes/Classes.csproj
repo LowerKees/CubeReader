@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArtifactReader.cs" />
+    <Compile Include="Check.cs" />
     <Compile Include="Column.cs" />
     <Compile Include="Cube.cs" />
     <Compile Include="CubeColumn.cs" />
@@ -50,7 +51,7 @@
     <Compile Include="DataSource.cs" />
     <Compile Include="Information.cs" />
     <Compile Include="MatchException.cs" />
-    <Compile Include="Matching.cs" />
+    <Compile Include="Match.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -127,9 +127,15 @@ namespace CubeReader
                 {
                     foreach (Match match in matches)
                     {
+                        // Print out the information 
                         IntroduceCubeChecks(match.MatchingCube._cubeName);
-                        match.CheckForTables(match);
-                        match.CheckForColumns(match);
+                        // Check if all cube tables are
+                        // matched in the database
+                        Check.CheckForTables(match);
+                        // Check if all cube columns have
+                        // corresponding database columns
+                        // and that the data type is a match
+                        Check.CheckForColumns(match);
                     }
                 }
                 catch (MatchException me)
@@ -143,6 +149,7 @@ namespace CubeReader
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
                 }
 
                 // Run additional info statements
