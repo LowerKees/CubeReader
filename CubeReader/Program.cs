@@ -10,95 +10,18 @@ namespace CubeReader
 	{
 		static void Main(string[] args)
 		{
-			// Finding the cubes we're looking for
-			string cubePath = ProgramFlow.setCubePath();
-			string dacpacPath = ProgramFlow.setDacpacPath();
-
-			// Check validity of the paths
-			// and control program flow
-			if (ProgramFlow.CheckPath(ref cubePath) == "X" || 
-				ProgramFlow.CheckPath(ref dacpacPath) == "X")
-			{
-				Environment.Exit(0);
-			}
-
-			// Creating cube file list for in-memory storage
-			List<string> xmlaFiles = new List<string>();
-			xmlaFiles.AddRange(getFileList(cubePath, "*.xmla"));
-
 			List<Cube> compareCubeList = new List<Cube>();
 
-			try
-			{
-				foreach (string cubeFile in xmlaFiles)
-				{
-					Cube myCube = new Cube(cubeFile);
+			// Get user input
+			Dictionary<PathType, string> paths = ProgramFlow.UserInput();
 
-					// Print tables and columns
-					// Disabled getCubeInfo to reduce console output
-					// getCubeInfo(myCube); 
+			// Find cubes and databases
+			List<string> xmlaFileList = GetFileList(paths[PathType.cube], "*.xmla");
+			List<string> dacpacFileList = GetFileList(paths[PathType.dacpac], "*.dacpac");
 
-					// Add the cube to the compare list
-					compareCubeList.Add(myCube);
-				}
-			}
-			catch (Exception e)
-			{
-				throw;
-			}
-
-			// Unpack dacpac files
-			List<string> dacpacFileList = new List<string>();
-			dacpacFileList.AddRange(getFileList(dacpacPath, "*.dacpac"));
-			string unpackingPath = Environment.CurrentDirectory + "\\Unpacking";
-
-			// Unpack the dacpac files
-			try
-			{
-				// Empty target location for each run
-				foreach (string dir in Directory.GetDirectories(unpackingPath))
-				{
-					foreach (string file in Directory.GetFiles(dir))
-					{
-						File.Delete(file);
-					}
-					Directory.Delete(dir);
-				}
-
-				// Unpack the dacpac
-				foreach (string file in dacpacFileList)
-				{
-					unpackDacpac(file, unpackingPath);
-				}
-			}
-			catch (Exception e)
-			{
-				throw;
-			}
-
-			// Read the model.xml file from the dacpac into memory
-			List<Database> compareDatabaseList = new List<Database>();
-
-			try
-			{
-				foreach (string dir in Directory.GetDirectories(unpackingPath))
-				{
-					foreach (string file in Directory.GetFiles(dir, "model.xml"))
-					{
-						Database database = new Database(file);
-
-						// Print info to client
-						// Disabled method to reduce console window output
-						// getDatabaseInfo(database);
-
-						compareDatabaseList.Add(database);
-					}
-				}
-			}
-			catch (Exception e)
-			{
-				throw;
-			}
+			// Extract databases and cubes into memory
+			List<Database> databases = UnpackDacpac.UnpackDacpacs(dacpacFileList);
+			List<Cube> cubes = UnpackCube.UnpackCubes(xmlaFileList);
 
 			// Match cubes and databases in list of matches
 			List<Match> matches = new List<Match>();
@@ -106,7 +29,7 @@ namespace CubeReader
 			{
 				foreach (Cube cube in compareCubeList)
 				{
-					matches.Add(Match.MatchCubeToDatabase(compareDatabaseList, cube));
+					matches.Add(Match.MatchCubeToDatabase(databases, cube));
 				}
 			}
 			catch (MatchException me)
@@ -169,43 +92,9 @@ namespace CubeReader
 			Console.ReadKey();
 		}
 
-		public static void getCubeInfo(Cube myCube)
-		{
-			Console.WriteLine($"Found the cube {myCube._cubeName}");
-			foreach (DataSource dataSource in myCube._cubeDs)
-			{
-				Console.WriteLine($"Found the connection string {dataSource._dsConnString}.");
-				Console.WriteLine($"Found the initial catalog {dataSource._dsInitCatalog}");
-			}
 
-			foreach (CubeTable cubeTable in myCube._cubeTables)
-			{
-				Console.WriteLine($"Found the table {cubeTable.CubeTableName} referencing {cubeTable.TableName}");
-				Console.WriteLine("Column list:");
-				foreach (CubeColumn cubeColumn in cubeTable.ColumnList)
-				{
-					Console.WriteLine($"Cube column: {cubeColumn.CubeColumnName} referencing db column {cubeColumn.ColumnName}");
-				}
-			}
-		}
 
-		public static void getDatabaseInfo(Database myDatabase)
-		{
-			Console.WriteLine($"Found the database {myDatabase._databaseDs._dsInitCatalog}");
-			Console.WriteLine($"Found the connection string {myDatabase._databaseDs._dsConnString}.");
-			Console.WriteLine($"Found the initial catalog {myDatabase._databaseDs._dsInitCatalog}");
-			foreach (Table dbTable in myDatabase._databaseTables)
-			{
-				Console.WriteLine($"Found the {dbTable.TableType} {dbTable.TableName}");
-				Console.WriteLine("Column list:");
-				foreach (Column column in dbTable.ColumnList)
-				{
-					Console.WriteLine($"Column: {column.ColumnName}");
-				}
-			}
-		}
-
-		private static List<string> getFileList(string path, string extension)
+		private static List<string> GetFileList(string path, string extension)
 		{
 			List<string> xmlaFiles = new List<string>();
 			xmlaFiles.AddRange(Directory.GetFiles(path, extension));
@@ -218,17 +107,7 @@ namespace CubeReader
 			return xmlaFiles;
 		}
 
-		public static void unpackDacpac(string dacpacPath, string unpackingPath)
-		{
-			Console.WriteLine($"Unpacking dacpac from {dacpacPath}");
 
-			unpackingPath += ("\\" + Path.GetFileNameWithoutExtension(dacpacPath));
-
-			// Unzip the dacpac file
-			// Create async operation for unzip
-			Console.WriteLine($"Unzipping {dacpacPath}...");
-			ZipFile.ExtractToDirectory(dacpacPath, unpackingPath);
-		}
 
 		private static void IntroduceCubeChecks(string cubeName)
 		{
