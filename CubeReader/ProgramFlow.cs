@@ -80,6 +80,19 @@ namespace CubeReader
 
 			return path;
 		}
+
+		public static List<string> GetFileList(string path, string extension)
+		{
+			List<string> files = new List<string>();
+			files.AddRange(Directory.GetFiles(path, extension));
+
+			foreach (string file in files)
+			{
+				Console.WriteLine($"Found the file {file}");
+			}
+
+			return files;
+		}
 	}
 
 	public enum PathType { cube, dacpac }
