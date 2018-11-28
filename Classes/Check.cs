@@ -8,6 +8,39 @@ namespace Classes
 {
     public class Check
     {
+		public static void RunChecks(List<Match> matches)
+		{
+			try
+			{
+				foreach (Match match in matches)
+				{
+					// Print out the information 
+					Information.IntroduceCubeChecks(match.MatchingCube._cubeName);
+					// Check if all cube tables are
+					// matched in the database
+					Check.CheckForTables(match);
+					// Check if all cube columns have
+					// corresponding database columns
+					// and that the data type is a match
+					Check.CheckForColumns(match);
+				}
+			}
+			catch (Exception e)
+			{
+				Information.OutputInformation(e.Message, Information.MessageType.Error);
+			}
+		}
+
+		public static void RunAdditionalCubeChecks(List<Cube> cubes)
+		{
+			Information.IntroduceAdditionalChecks();
+			foreach(Cube cube in cubes)
+			{
+				OutputLogicalColumns(cube);
+			}
+
+		}
+
         public static void CheckForTables(Match match)
         {
             //
@@ -157,5 +190,18 @@ namespace Classes
             Console.WriteLine($"WARNING: {failedCondition}");
             Console.ResetColor();
         }
-    }
+
+		private static void OutputLogicalColumns(Cube cube)
+		{
+			foreach (CubeTable table in cube._cubeTables)
+			{
+				foreach (CubeColumn logicalColumn in table.LogicalColumns)
+				{
+					string warning = $"Found logical column {logicalColumn.CubeColumnName} " +
+						$"in cube {cube._cubeName}.";
+					Information.OutputInformation(warning, Information.MessageType.Warning);
+				}
+			}
+		}
+	}
 }
