@@ -20,34 +20,30 @@ namespace Classes
             MatchingCube = matchingCube;
             MatchedDatabases = new List<Database>();
         }
-            
-        private Cube _matchingCube;
-        public Cube MatchingCube
-        {
-            get
-            {
-                return _matchingCube;
-            }
-            set
-            {
-                _matchingCube = value;
-            }
-        }
 
-        private List<Database> _matchedDatabases;
-        public List<Database> MatchedDatabases
-        {
-            get
-            {
-                return _matchedDatabases;
-            }
-            set
-            {
-                _matchedDatabases = value;
-            }
-        }
+		public Cube MatchingCube { get; set; }
+		public List<Database> MatchedDatabases { get; set; }
 
-        public static Match MatchCubeToDatabase(List<Database> databases, Cube cube)
+		public static List<Match> CreateMatchList(List<Database> databases, List<Cube> cubes)
+		{
+			List<Match> matches = new List<Match>();
+			try
+			{
+				foreach (Cube cube in cubes)
+				{
+					matches.Add(Match.MatchCubeToDatabase(databases, cube));
+				}
+				return matches;
+			}
+			catch (Exception e)
+			{
+				Information.OutputInformation(e.Message, Information.MessageType.Error);
+				throw;
+			}
+
+		}
+
+		public static Match MatchCubeToDatabase(List<Database> databases, Cube cube)
         {
             //
             // Summary:
