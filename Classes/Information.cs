@@ -8,19 +8,6 @@ namespace Classes
 {
     public static class Information
     {
-        public static void OutputLogicalColumns(Cube cube)
-        {
-            foreach (CubeTable table in cube._cubeTables)
-            {
-                foreach (CubeColumn logicalColumn in table.LogicalColumns)
-                {
-                    string warning = $"Found logical column {logicalColumn.CubeColumnName} " +
-                        $"in cube {cube._cubeName}.";
-                    OutputInformation(warning, MessageType.Warning);
-                }
-            }
-        }
-
         public enum MessageType
         {
             Information = 1,
@@ -90,6 +77,18 @@ namespace Classes
 					}
 				}
 			}
+		}
+
+		public static void IntroduceCubeChecks(string cubeName)
+		{
+			Console.WriteLine("\n*****************************************************");
+			Console.WriteLine($"***** Running checks for {cubeName}...\n");
+		}
+
+		public static void IntroduceAdditionalChecks()
+		{
+			Console.WriteLine("\n*******************************************");
+			Console.WriteLine("***** Running additional info statements\n");
 		}
 	}
 }
